@@ -4,8 +4,8 @@ import { defineConfig } from "wxt";
 export default defineConfig({
   manifest: {
     default_locale: "en",
-    description: "Proactive agent that helps you browse the web faster",
-    name: "Browzy",
+    description: "Book Google Calendar meetings automatically",
+    name: "Calendar Scheduler",
     version: "0.0.1",
     permissions: [
       "tabs",
