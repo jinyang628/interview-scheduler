@@ -14,9 +14,9 @@ export default defineConfig({
       "webNavigation",
       "storage",
       "scripting",
-      "downloads", 
+      "downloads",
       "cookies",
-      "notifications"
+      "notifications",
     ],
     background: {
       service_worker: "background.js",
