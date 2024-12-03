@@ -1,0 +1,1 @@
+export const EXTRACT_HTML_ACTION = "EXTRACT_HTML";
