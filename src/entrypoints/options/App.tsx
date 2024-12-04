@@ -12,7 +12,7 @@ export default function App() {
   return (
     <div className="flex justify-center h-screen w-full p-8">
       <Toaster />
-      <div className="flex justify-center flex-col space-y-4 max-w-[800px] max-h-[800px] w-full p-4 mx-auto">
+      <div className="flex justify-center flex-col space-y-4 max-w-[600px] max-h-[600px] w-full p-4 mx-auto">
         <Card className="flex flex-col justify-center align-middle space-y-4 max-w-[auto] p-4 w-full mx-auto">
           <p className="text-base font-semibold">OpenAI API Key:</p>
           <Input
