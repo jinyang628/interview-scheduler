@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 import { extractHtmlResponseSchema } from "@/types/browser";
 import { Message } from "@/types/email";
 import { extractEmail } from "@/utils/email";
+import { generateText } from "@/utils/openai";
 
 export default function App() {
   const extractHtml = async () => {
@@ -19,6 +20,10 @@ export default function App() {
       }),
     );
     const messages: Message[] = extractEmail(response.html);
+    const prompt = "Write a haiku about programming";
+    generateText(prompt)
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
     console.log(messages);
   };
 
