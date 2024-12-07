@@ -5,3 +5,7 @@ export const extractHtmlResponseSchema = z.object({
 });
 
 export type ExtractHtmlResponse = z.infer<typeof extractHtmlResponseSchema>;
+
+export const invokeMessageRequestSchema = z.object({
+  prompt: z.string(),
+});

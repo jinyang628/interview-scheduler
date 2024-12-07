@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { EXTRACT_HTML_ACTION } from "@/constants/browser";
+import { EXTRACT_HTML_ACTION, INVOKE_ACTION } from "@/constants/browser";
 import "@/styles/globals.css";
-import { extractHtmlResponseSchema } from "@/types/browser";
+import {
+  extractHtmlResponseSchema,
+  invokeMessageRequestSchema,
+} from "@/types/browser";
 import { Message } from "@/types/email";
 import { extractEmail } from "@/utils/email";
-import { generateText } from "@/utils/openai";
 
 export default function App() {
   const extractHtml = async () => {
@@ -20,10 +22,14 @@ export default function App() {
       }),
     );
     const messages: Message[] = extractEmail(response.html);
-    const prompt = "Write a haiku about programming";
-    generateText(prompt)
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
+
+    const invokeMessageInput = invokeMessageRequestSchema.parse({
+      prompt: "Write a haiku about programming",
+    });
+    await browser.runtime.sendMessage({
+      action: INVOKE_ACTION,
+      input: invokeMessageInput,
+    });
     console.log(messages);
   };
 

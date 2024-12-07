@@ -1,13 +1,7 @@
+import { logger } from "@/lib/logger";
 import OpenAI from "openai";
 
-function createOpenAIClient(apiKey: string) {
-  return new OpenAI({
-    apiKey: apiKey,
-    dangerouslyAllowBrowser: true,
-  });
-}
-
-export async function generateText(prompt: string) {
+export async function invoke(prompt: string): Promise<string> {
   let apiKey: string = "";
 
   try {
@@ -23,7 +17,9 @@ export async function generateText(prompt: string) {
     throw new Error("No OpenAI API key found");
   }
 
-  const client = createOpenAIClient(apiKey);
+  const client = new OpenAI({
+    apiKey: apiKey,
+  });
 
   try {
     const response = await client.chat.completions.create({
@@ -33,7 +29,12 @@ export async function generateText(prompt: string) {
       temperature: 0.7,
     });
 
-    return response.choices[0].message.content;
+    const content: string | null = response.choices[0].message.content;
+    if (!content) {
+      throw new Error("No content found in response");
+    }
+    logger.info("OpenAI response:", content);
+    return content;
   } catch (error) {
     console.error(error);
     throw error;
