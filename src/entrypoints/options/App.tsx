@@ -6,8 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 export default function App() {
   const [openAiKey, setOpenAiKey] = useState<string>("");
-  const [calendarAccessToken, setCalendarAccessToken] = useState<string>("");
-  const [calendarRefreshToken, setCalendarRefreshToken] = useState<string>("");
+  const [calendarKey, setCalendarKey] = useState<string>("");
 
   return (
     <div className="flex justify-center h-screen w-full p-8">
@@ -20,26 +19,18 @@ export default function App() {
             value={openAiKey}
             placeholder="Enter your OpenAI API key"
           />
-          <p className="text-base font-semibold">Calendar Access Token:</p>
+          <p className="text-base font-semibold">Google Calendar API Key:</p>
           <Input
-            onChange={(e) => setCalendarAccessToken(e.target.value)}
-            value={calendarAccessToken}
-            placeholder="Enter your Calendar Access Token"
+            onChange={(e) => setCalendarKey(e.target.value)}
+            value={calendarKey}
+            placeholder="Enter your Google Calendar API key"
           />
-          <p className="text-base font-semibold">Calendar Refresh Token:</p>
-          <Input
-            onChange={(e) => setCalendarRefreshToken(e.target.value)}
-            value={calendarRefreshToken}
-            placeholder="Enter your Calendar Refresh Token"
-          />
+
           <Button
             onClick={() => {
               browser.storage.sync.set({ openAiKey: openAiKey });
               browser.storage.sync.set({
-                calendarAccessToken: calendarAccessToken,
-              });
-              browser.storage.sync.set({
-                calendarRefreshToken: calendarRefreshToken,
+                calendarKey: calendarKey,
               });
               toast({
                 title: "Settings saved!",

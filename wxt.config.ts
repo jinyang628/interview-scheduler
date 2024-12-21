@@ -17,6 +17,8 @@ export default defineConfig({
       "downloads",
       "cookies",
       "notifications",
+      "https://www.googleapis.com/auth/calendar",
+      "identity",
     ],
     background: {
       service_worker: "background.js",

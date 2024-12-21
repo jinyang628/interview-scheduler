@@ -1,7 +1,9 @@
 import { logger } from "@/lib/logger";
 import OpenAI from "openai";
+import { zodResponseFormat } from "openai/helpers/zod";
+import { CalendarEvent, calendarEventSchema } from "@/types/calendar";
 
-export async function invoke(prompt: string): Promise<string> {
+export async function invoke(prompt: string): Promise<CalendarEvent> {
   let apiKey: string = "";
 
   try {
@@ -22,19 +24,27 @@ export async function invoke(prompt: string): Promise<string> {
   });
 
   try {
-    const response = await client.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 100,
+    const response = await client.beta.chat.completions.parse({
+      model: "gpt-4o-2024-11-20",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Extract the calendar event information given the context of the email content.",
+        },
+        { role: "user", content: prompt },
+      ],
       temperature: 0.7,
+      response_format: zodResponseFormat(calendarEventSchema, "event"),
     });
 
-    const content: string | null = response.choices[0].message.content;
-    if (!content) {
+    const event = response.choices[0].message.parsed;
+
+    if (!event) {
       throw new Error("No content found in response");
     }
-    logger.info("OpenAI response:", content);
-    return content;
+    logger.info("OpenAI response:", event);
+    return event;
   } catch (error) {
     console.error(error);
     throw error;

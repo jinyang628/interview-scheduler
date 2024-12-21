@@ -5,8 +5,17 @@ class Logger {
     message: string,
     args?: string | object | "",
   ) {
-    // eslint-disable-next-line no-console
-    console[level](`[${level.toUpperCase()}] ${message} ${args ? args : ""}`);
+    if (args instanceof Error) {
+      // eslint-disable-next-line no-console
+      console[level](`[${level.toUpperCase()}] ${message}`, {
+        name: args.name,
+        message: args.message,
+        stack: args.stack,
+      });
+    } else {
+      // eslint-disable-next-line no-console
+      console[level](`[${level.toUpperCase()}] ${message} ${args ? args : ""}`);
+    }
   }
 
   info(message: string, args?: string | object) {
@@ -17,7 +26,7 @@ class Logger {
     this.logWithLevel("warn", message, args);
   }
 
-  error(message: string, args?: string | object) {
+  error(message: string, args?: string | object | Error) {
     this.logWithLevel("error", message, args);
   }
 }

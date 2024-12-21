@@ -32,6 +32,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.17",
+    "google-auth-library": "^9.15.0",
+    "googleapis": "^144.0.0",
     "lucide-react": "^0.460.0",
     "next-themes": "^0.4.3",
     "normalize-url": "^8.0.1",
