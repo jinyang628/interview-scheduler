@@ -2,8 +2,9 @@ import { logger } from "@/lib/logger";
 import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { CalendarEvent, calendarEventSchema } from "@/types/calendar";
+import { Message } from "@/types/email";
 
-export async function invoke(prompt: string): Promise<CalendarEvent> {
+export async function invoke(messages: Message[]): Promise<CalendarEvent> {
   let apiKey: string = "";
 
   try {
@@ -32,7 +33,13 @@ export async function invoke(prompt: string): Promise<CalendarEvent> {
           content:
             "Extract the calendar event information given the context of the email content.",
         },
-        { role: "user", content: prompt },
+        {
+          role: "user",
+          content: messages.map((msg) => ({
+            type: "text",
+            text: `From: ${msg.name} <${msg.email}>\n${msg.content}`,
+          })),
+        },
       ],
       temperature: 0.7,
       response_format: zodResponseFormat(calendarEventSchema, "event"),

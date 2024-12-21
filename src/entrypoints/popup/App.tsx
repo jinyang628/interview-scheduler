@@ -3,7 +3,7 @@ import { EXTRACT_HTML_ACTION, INVOKE_ACTION } from "@/constants/browser";
 import "@/styles/globals.css";
 import {
   extractHtmlResponseSchema,
-  invokeMessageRequestSchema,
+  invokeRequestSchema,
 } from "@/types/browser";
 import { Message } from "@/types/email";
 import { extractEmail } from "@/utils/email";
@@ -23,12 +23,12 @@ export default function App() {
     );
     const messages: Message[] = extractEmail(response.html);
 
-    const invokeMessageInput = invokeMessageRequestSchema.parse({
-      prompt: "Write a haiku about programming",
+    const input = invokeRequestSchema.parse({
+      messages: messages,
     });
     await browser.runtime.sendMessage({
       action: INVOKE_ACTION,
-      input: invokeMessageInput,
+      input: input,
     });
     console.log(messages);
   };

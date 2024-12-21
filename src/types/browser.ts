@@ -1,3 +1,4 @@
+import { messageSchema } from "@/types/email";
 import { z } from "zod";
 
 export const extractHtmlResponseSchema = z.object({
@@ -6,6 +7,6 @@ export const extractHtmlResponseSchema = z.object({
 
 export type ExtractHtmlResponse = z.infer<typeof extractHtmlResponseSchema>;
 
-export const invokeMessageRequestSchema = z.object({
-  prompt: z.string(),
+export const invokeRequestSchema = z.object({
+  messages: z.array(messageSchema),
 });
