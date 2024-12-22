@@ -1,26 +1,29 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
-import { Toaster } from "@/components/ui/toaster";
+import { toast } from '@/hooks/use-toast';
+
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Toaster } from '@/components/ui/toaster';
 
 export default function App() {
-  const [openAiKey, setOpenAiKey] = useState<string>("");
-  const [calendarKey, setCalendarKey] = useState<string>("");
+  const [openAiKey, setOpenAiKey] = useState<string>('');
+  const [calendarKey, setCalendarKey] = useState<string>('');
 
   return (
-    <div className="flex justify-center h-screen w-full p-8">
+    <div className="flex h-screen w-full justify-center p-8">
       <Toaster />
-      <div className="flex justify-center flex-col space-y-4 max-w-[600px] max-h-[600px] w-full p-4 mx-auto">
-        <Card className="flex flex-col justify-center align-middle space-y-4 max-w-[auto] p-4 w-full mx-auto">
+      <div className="mx-auto flex max-h-[600px] w-full max-w-[600px] flex-col justify-center space-y-4 p-4">
+        <Card className="mx-auto flex w-full max-w-[auto] flex-col justify-center space-y-4 p-4 align-middle">
           <p className="text-base font-semibold">OpenAI API Key:</p>
           <Input
+            type="password"
             onChange={(e) => setOpenAiKey(e.target.value)}
             value={openAiKey}
             placeholder="Enter your OpenAI API key"
           />
           <p className="text-base font-semibold">Google Calendar API Key:</p>
           <Input
+            type="password"
             onChange={(e) => setCalendarKey(e.target.value)}
             value={calendarKey}
             placeholder="Enter your Google Calendar API key"
@@ -33,7 +36,7 @@ export default function App() {
                 calendarKey: calendarKey,
               });
               toast({
-                title: "Settings saved!",
+                title: 'Settings saved!',
               });
             }}
           >

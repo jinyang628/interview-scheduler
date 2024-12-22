@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { EXTRACT_HTML_ACTION, INVOKE_ACTION } from "@/constants/browser";
-import "@/styles/globals.css";
-import {
-  extractHtmlResponseSchema,
-  invokeRequestSchema,
-} from "@/types/browser";
-import { Message } from "@/types/email";
-import { extractEmail } from "@/utils/email";
+import { EXTRACT_HTML_ACTION, INVOKE_ACTION } from '@/constants/browser';
+import { extractEmail } from '@/utils/email';
+
+import { Button } from '@/components/ui/button';
+
+import { extractHtmlResponseSchema, invokeRequestSchema } from '@/types/browser';
+import { Message } from '@/types/email';
+
+import '@/styles/globals.css';
 
 export default function App() {
   const extractHtml = async () => {
@@ -35,7 +35,7 @@ export default function App() {
 
   return (
     // This should be the only container with hard coded width and height
-    <div className="flex flex-col items-center justify-center w-[200px] h-[200px] space-y-5">
+    <div className="flex h-[200px] w-[200px] flex-col items-center justify-center space-y-5">
       <Button onClick={extractHtml}>Book Meeting!</Button>
     </div>
   );

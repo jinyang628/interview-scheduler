@@ -1,5 +1,6 @@
-import { messageSchema } from "@/types/email";
-import { z } from "zod";
+import { z } from 'zod';
+
+import { messageSchema } from '@/types/email';
 
 export const extractHtmlResponseSchema = z.object({
   html: z.string(),

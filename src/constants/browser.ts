@@ -1,2 +1,2 @@
-export const EXTRACT_HTML_ACTION = "EXTRACT_HTML";
-export const INVOKE_ACTION = "INVOKE";
+export const EXTRACT_HTML_ACTION = 'EXTRACT_HTML';
+export const INVOKE_ACTION = 'INVOKE';

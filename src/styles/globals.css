@@ -1,4 +1,4 @@
-@import "./typography.css";
+@import './typography.css';
 
 @tailwind base;
 @tailwind components;
@@ -75,12 +75,12 @@
 
 @layer components {
   .toggle-sun-icon {
-    -webkit-mask-image: url("/images/toggle-sun.svg");
+    -webkit-mask-image: url('/images/toggle-sun.svg');
     @apply mask-styles toggle-icon-size;
   }
 
   .toggle-moon-icon {
-    -webkit-mask-image: url("/images/toggle-moon.svg");
+    -webkit-mask-image: url('/images/toggle-moon.svg');
     @apply mask-styles toggle-icon-size;
   }
 
@@ -115,23 +115,23 @@
   }
 
   .xcom-icon {
-    -webkit-mask-image: url("/images/footer/x-com.svg");
+    -webkit-mask-image: url('/images/footer/x-com.svg');
     @apply mask-styles footer-icon-size;
   }
   .linkedin-icon {
-    -webkit-mask-image: url("/images/footer/linkedin.svg");
+    -webkit-mask-image: url('/images/footer/linkedin.svg');
     @apply mask-styles footer-icon-size;
   }
   .github-icon {
-    -webkit-mask-image: url("/images/footer/github.svg");
+    -webkit-mask-image: url('/images/footer/github.svg');
     @apply mask-styles footer-icon-size;
   }
   .youtube-icon {
-    -webkit-mask-image: url("/images/footer/youtube.svg");
+    -webkit-mask-image: url('/images/footer/youtube.svg');
     @apply mask-styles footer-icon-size;
   }
   .discord-icon {
-    -webkit-mask-image: url("/images/footer/discord.svg");
+    -webkit-mask-image: url('/images/footer/discord.svg');
     @apply mask-styles footer-icon-size;
   }
 }
@@ -167,6 +167,6 @@
   }
 
   .logo {
-    @apply w-16 h-16;
+    @apply h-16 w-16;
   }
 }

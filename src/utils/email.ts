@@ -1,56 +1,56 @@
-import { logger } from "@/lib/logger";
-import { Message, messageSchema } from "@/types/email";
+import { Message, messageSchema } from '@/types/email';
+
+import { logger } from '@/lib/logger';
 
 export function extractEmail(html: string): Message[] {
   const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
+  const doc = parser.parseFromString(html, 'text/html');
 
   const messagesDivs = doc.querySelectorAll('div[class="gs"]');
   const messages: Message[] = [];
   for (const messageDiv of messagesDivs) {
-    const contactInfoh3 = messageDiv.querySelector("h3.iw.gFxsud");
+    const contactInfoh3 = messageDiv.querySelector('h3.iw.gFxsud');
     if (!contactInfoh3) {
-      logger.error("Contact info h3 not found");
+      logger.error('Contact info h3 not found');
       continue;
     }
-    const spans = contactInfoh3.querySelectorAll("span");
+    const spans = contactInfoh3.querySelectorAll('span');
     let email: string | null = null;
     let name: string | null = null;
     for (const span of spans) {
-      if (!span.hasAttribute("email") || !span.hasAttribute("name")) {
+      if (!span.hasAttribute('email') || !span.hasAttribute('name')) {
         continue;
       }
-      email = span.getAttribute("email");
-      name = span.getAttribute("name");
+      email = span.getAttribute('email');
+      name = span.getAttribute('name');
       break;
     }
     if (!email) {
-      logger.error("Email not found");
+      logger.error('Email not found');
       continue;
     }
     if (!name) {
-      logger.error("Name not found");
+      logger.error('Name not found');
       continue;
     }
 
-    let contentDiv: HTMLElement | null =
-      messageDiv.querySelector('div[dir="ltr"]');
+    let contentDiv: HTMLElement | null = messageDiv.querySelector('div[dir="ltr"]');
     if (!contentDiv) {
-      contentDiv = messageDiv.querySelector("div.ii.gt");
+      contentDiv = messageDiv.querySelector('div.ii.gt');
       if (!contentDiv) {
-        logger.error("Content div not found");
+        logger.error('Content div not found');
         continue;
       }
     }
     const content: string | null = contentDiv.textContent;
     if (!content) {
-      logger.error("Content not found");
+      logger.error('Content not found');
       continue;
     }
     const message = messageSchema.parse({
       name: name,
       email: email,
-      content: content.trim().replace(/\s+/g, " "),
+      content: content.trim().replace(/\s+/g, ' '),
     });
     messages.push(message);
   }
