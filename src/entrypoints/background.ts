@@ -15,9 +15,9 @@ import { logger } from '@/lib/logger';
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((message, sender) => {
     // Return a promise that resolves with our response
-    const responsePromise = (async () => {
-      switch (message.action) {
-        case SCHEDULE_CALENDAR_EVENT_ACTION:
+    switch (message.action) {
+      case SCHEDULE_CALENDAR_EVENT_ACTION:
+        return (async () => {
           try {
             const input = scheduleCalendarEventRequestSchema.parse(message.input);
             const calendarEvent: CalendarEvent = await invoke(input.messages);
@@ -32,15 +32,14 @@ export default defineBackground(() => {
             logger.info('Schedule Calendar Event response:', scheduleCalendarEventResponse);
             return scheduleCalendarEventResponse;
           } catch (error: unknown) {
+            console.error(error);
             if (error instanceof Error) {
-              logger.error(error.message);
               return scheduleCalendarEventResponseSchema.parse({
                 error: errorSchema.parse({
                   message: error.message,
                 }),
               });
             } else {
-              console.error(error);
               return scheduleCalendarEventResponseSchema.parse({
                 error: errorSchema.parse({
                   message: 'Unknown error',
@@ -48,14 +47,11 @@ export default defineBackground(() => {
               });
             }
           }
+        })();
 
-        default:
-          logger.error('Action not recognised in background script');
-          return undefined;
-      }
-    })();
-
-    // Return true to indicate we'll send response asynchronously
-    return true;
+      default:
+        console.error('Action not recognised in background script');
+        return undefined;
+    }
   });
 });

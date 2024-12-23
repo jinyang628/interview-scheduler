@@ -15,10 +15,12 @@ import { logger } from '@/lib/logger';
 
 import '@/styles/globals.css';
 
+type SchedulingStatus = 'idle' | 'loading' | 'success' | 'error';
+
 export default function App() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [schedulingStatus, setSchedulingStatus] = useState<SchedulingStatus>('idle');
   const bookMeeting = async () => {
-    setIsLoading(true);
+    setSchedulingStatus('loading');
     try {
       const [tab] = await browser.tabs.query({
         active: true,
@@ -41,14 +43,14 @@ export default function App() {
           input: input,
         }),
       );
+      setSchedulingStatus('success');
     } catch (error: unknown) {
       if (error instanceof Error) {
         logger.error(error.message);
       } else {
         console.error(error);
       }
-    } finally {
-      setIsLoading(false);
+      setSchedulingStatus('error');
     }
   };
 
@@ -56,7 +58,21 @@ export default function App() {
     // This should be the only container with hard coded width and height
     <div className="flex h-[200px] w-[200px] flex-col items-center justify-center space-y-5">
       <Button onClick={bookMeeting}>Book Meeting!</Button>
-      <Loader isLoading={isLoading} />
+      <Loader isLoading={schedulingStatus === 'loading'} />
+      {schedulingStatus === 'success' && (
+        <div className="text-center">
+          <p className="text-base font-semibold">Meeting Booked!</p>
+          <p className="text-sm">
+            You can now close this tab and return to your calendar to view the meeting details.
+          </p>
+        </div>
+      )}
+      {schedulingStatus === 'error' && (
+        <div className="text-center">
+          <p className="text-base font-semibold">Error scheduling meeting!</p>
+          <p className="text-sm">Please try again later.</p>
+        </div>
+      )}
     </div>
   );
 }
