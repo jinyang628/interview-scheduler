@@ -7,6 +7,7 @@ export const dateTimeSchema = z.object({
 export const calendarEventSchema = z.object({
   summary: z.string(),
   description: z.string(),
+  meetingLink: z.string().nullable(),
   start: dateTimeSchema,
   end: dateTimeSchema,
 });
