@@ -56,23 +56,24 @@ export default function App() {
 
   return (
     // This should be the only container with hard coded width and height
-    <div className="flex h-[200px] w-[200px] flex-col items-center justify-center space-y-5">
+    <div className="flex h-[400px] w-[400px] flex-col items-center justify-center space-y-5">
       <Button onClick={bookMeeting}>Book Meeting!</Button>
       <Loader isLoading={schedulingStatus === 'loading'} />
-      {schedulingStatus === 'success' && (
-        <div className="text-center">
-          <p className="text-base font-semibold">Meeting Booked!</p>
-          <p className="text-sm">
-            You can now close this tab and return to your calendar to view the meeting details.
-          </p>
-        </div>
-      )}
-      {schedulingStatus === 'error' && (
-        <div className="text-center">
-          <p className="text-base font-semibold">Error scheduling meeting!</p>
-          <p className="text-sm">Please try again later.</p>
-        </div>
-      )}
+      <div
+        className="text-center"
+        style={{ opacity: ['success', 'error'].includes(schedulingStatus) ? 1 : 0 }}
+      >
+        <p
+          className={`text-base font-semibold ${schedulingStatus === 'success' ? 'text-green-600' : 'text-red-600'}`}
+        >
+          {schedulingStatus === 'success' ? 'Meeting Booked!' : 'Error scheduling meeting!'}
+        </p>
+        <p className="text-sm">
+          {schedulingStatus === 'success'
+            ? 'Meting details are in your calendar.'
+            : 'Please try again later.'}
+        </p>
+      </div>
     </div>
   );
 }
