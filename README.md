@@ -1,6 +1,7 @@
-# interview-scheduler
+# Interview Scheduler
 
-Plans:
+This Chrome extension automatically schedules meetings on google calendar based on the information present in the the email content. It also helps you to draft a short appropriate reply to the sender.
 
-- Make an request to Google Calendar API to automatically create a meeting
-- Draft an automatic reply to the sender given the context of my resume(?)
+## How to use
+
+Clone this repository
