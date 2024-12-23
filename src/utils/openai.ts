@@ -4,7 +4,7 @@ import { zodResponseFormat } from 'openai/helpers/zod';
 import { CalendarEvent, calendarEventSchema } from '@/types/calendar';
 import { Message } from '@/types/email';
 
-import { logger } from '@/lib/logger';
+const MODEL_NAME = 'gpt-4o-2024-11-20';
 
 export async function invoke(messages: Message[]): Promise<CalendarEvent> {
   let apiKey: string = '';
@@ -28,11 +28,12 @@ export async function invoke(messages: Message[]): Promise<CalendarEvent> {
 
   try {
     const response = await client.beta.chat.completions.parse({
-      model: 'gpt-4o-2024-11-20',
+      model: MODEL_NAME,
       messages: [
         {
           role: 'system',
-          content: 'Extract the calendar event information given the context of the email content.',
+          content:
+            'Extract the calendar event information given the context of the email content. If a zoom/microsoft/google meeting link is specified in the email, you must include it clearly in the description of your response',
         },
         {
           role: 'user',

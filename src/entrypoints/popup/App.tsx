@@ -19,28 +19,37 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const bookMeeting = async () => {
     setIsLoading(true);
-    const [tab] = await browser.tabs.query({
-      active: true,
-      currentWindow: true,
-    });
+    try {
+      const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
 
-    const extractHtmlResponse = extractHtmlResponseSchema.parse(
-      await browser.tabs.sendMessage(tab.id!, {
-        action: EXTRACT_HTML_ACTION,
-      }),
-    );
-    const messages: Message[] = extractEmail(extractHtmlResponse.html);
+      const extractHtmlResponse = extractHtmlResponseSchema.parse(
+        await browser.tabs.sendMessage(tab.id!, {
+          action: EXTRACT_HTML_ACTION,
+        }),
+      );
+      const messages: Message[] = extractEmail(extractHtmlResponse.html);
 
-    const input = scheduleCalendarEventRequestSchema.parse({
-      messages: messages,
-    });
-    const scheduleCalendarEventResponse = scheduleCalendarEventResponseSchema.parse(
-      await browser.runtime.sendMessage({
-        action: SCHEDULE_CALENDAR_EVENT_ACTION,
-        input: input,
-      }),
-    );
-    setIsLoading(false);
+      const input = scheduleCalendarEventRequestSchema.parse({
+        messages: messages,
+      });
+      const scheduleCalendarEventResponse = scheduleCalendarEventResponseSchema.parse(
+        await browser.runtime.sendMessage({
+          action: SCHEDULE_CALENDAR_EVENT_ACTION,
+          input: input,
+        }),
+      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        logger.error(error.message);
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
