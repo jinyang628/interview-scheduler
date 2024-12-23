@@ -51,7 +51,6 @@ export async function invoke(messages: Message[]): Promise<CalendarEvent> {
     if (!event) {
       throw new Error('No content found in response');
     }
-    logger.info('OpenAI response:', event);
     return event;
   } catch (error) {
     console.error(error);

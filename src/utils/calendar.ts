@@ -1,28 +1,37 @@
+import { CalendarEvent } from '@/types/calendar';
+
 import { logger } from '@/lib/logger';
 
-export interface CalendarEvent {
-  summary: string;
-  description?: string;
-  start: { dateTime: string };
-  end: { dateTime: string };
+interface AuthTokenResponse {
+  token: string;
+  grantedScopes: string[];
+}
+
+async function getAuthToken(): Promise<string> {
+  try {
+    const auth = (await browser.identity.getAuthToken({
+      interactive: true,
+      scopes: ['https://www.googleapis.com/auth/calendar'],
+    })) as unknown as AuthTokenResponse; // Ugly type casting that works for chrome but not compatible with firefox at the moment
+    return auth.token;
+  } catch (error) {
+    logger.error('Error getting auth token:', error as Error);
+    throw new Error('Failed to authenticate with Google Calendar');
+  }
 }
 
 export async function createCalendarEvent(event: CalendarEvent): Promise<string> {
-  let apiKey: string = '';
-  const result = await browser.storage.sync.get('calendarKey');
-  if (result.calendarKey) {
-    apiKey = result.calendarKey;
-  }
-  if (!apiKey) {
-    throw new Error('No Google Calendar API key found');
-  }
+  logger.info('Creating calendar event:', event.summary);
 
   try {
+    const token = await getAuthToken();
+
     const response = await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/primary/events?key=${apiKey}`,
+      'https://www.googleapis.com/calendar/v3/calendars/primary/events',
       {
         method: 'POST',
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(event),
@@ -30,6 +39,8 @@ export async function createCalendarEvent(event: CalendarEvent): Promise<string>
     );
 
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      logger.error('Calendar API error response:', errorData);
       throw new Error(`Error creating calendar event with status: ${response.status}`);
     }
 
@@ -39,6 +50,7 @@ export async function createCalendarEvent(event: CalendarEvent): Promise<string>
       throw new Error('No google calendar event ID found');
     }
 
+    logger.info('Successfully created calendar event with ID:', data.id);
     return data.id;
   } catch (error) {
     logger.error('Error creating calendar event:', error as Error);

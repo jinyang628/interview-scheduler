@@ -17,9 +17,12 @@ export default defineConfig({
       'downloads',
       'cookies',
       'notifications',
-      'https://www.googleapis.com/auth/calendar',
       'identity',
     ],
+    oauth2: {
+      client_id: '724787516680-6c5q1imlervhdt7vrqfmrqm4q9dkae08.apps.googleusercontent.com',
+      scopes: ['https://www.googleapis.com/auth/calendar'],
+    },
     background: {
       service_worker: 'background.js',
       persistent: true,

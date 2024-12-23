@@ -7,7 +7,6 @@ import { Toaster } from '@/components/ui/toaster';
 
 export default function App() {
   const [openAiKey, setOpenAiKey] = useState<string>('');
-  const [calendarKey, setCalendarKey] = useState<string>('');
 
   return (
     <div className="flex h-screen w-full justify-center p-8">
@@ -21,22 +20,12 @@ export default function App() {
             value={openAiKey}
             placeholder="Enter your OpenAI API key"
           />
-          <p className="text-base font-semibold">Google Calendar API Key:</p>
-          <Input
-            type="password"
-            onChange={(e) => setCalendarKey(e.target.value)}
-            value={calendarKey}
-            placeholder="Enter your Google Calendar API key"
-          />
-
           <Button
             onClick={() => {
               browser.storage.sync.set({ openAiKey: openAiKey });
-              browser.storage.sync.set({
-                calendarKey: calendarKey,
-              });
               toast({
                 title: 'Settings saved!',
+                duration: 1500,
               });
             }}
           >
