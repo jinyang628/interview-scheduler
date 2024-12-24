@@ -6,14 +6,22 @@ import { InferenceResponse, inferenceResponseSchema } from '@/types/inference';
 
 const MODEL_NAME = 'gpt-4o-2024-11-20';
 
+const SYSTEM_PROMPT = `You have 2 tasks.
+
+1. Extract the calendar event information given the context of the email content. If a zoom/microsoft/google meetig link is specified in the email, you must include it clearly in the description of your response.
+
+2. Provide a short, polite email reply to the sender acknowledging the meeting. You should INCLUDE the "Dear [SENDER NAME],\n" prefix but OMIT the "Best regards..." suffix in your reply.`;
+
+const EMAIL_REPLY_TEMPLATE = (content: string, name: string) => `${content}
+
+Best regards,
+${name}`;
+
 export async function infer(messages: Message[]): Promise<InferenceResponse> {
   let apiKey: string = '';
 
   try {
-    const result = await browser.storage.sync.get('openAiKey');
-    if (result.openAiKey) {
-      apiKey = result.openAiKey;
-    }
+    apiKey = await browser.storage.sync.get('openAiKey').then((result) => result.openAiKey);
   } catch (error) {
     console.error('Error getting API key from storage:', error);
   }
@@ -32,8 +40,7 @@ export async function infer(messages: Message[]): Promise<InferenceResponse> {
       messages: [
         {
           role: 'system',
-          content:
-            'Extract the calendar event information given the context of the email content. If a zoom/microsoft/google meeting link is specified in the email, you must include it clearly in the description of your response. Additionally, provide a short, polite reply to the sender acknowledging the meeting.',
+          content: SYSTEM_PROMPT,
         },
         {
           role: 'user',
@@ -52,8 +59,13 @@ export async function infer(messages: Message[]): Promise<InferenceResponse> {
     if (!result) {
       throw new Error('No content found in response');
     }
+
+    result.reply = EMAIL_REPLY_TEMPLATE(
+      result.reply,
+      await browser.storage.sync.get('name').then((result) => result.name),
+    );
     return result;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(error);
     throw error;
   }

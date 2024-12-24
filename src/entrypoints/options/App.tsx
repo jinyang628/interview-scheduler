@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 export default function App() {
   const [openAiKey, setOpenAiKey] = useState<string>('');
   const [clientId, setClientId] = useState<string>('');
+  const [name, setName] = useState<string>('');
 
   return (
     <div className="flex h-screen w-full justify-center p-8">
@@ -28,6 +29,13 @@ export default function App() {
             value={clientId}
             placeholder="Enter your Google Cloud Project's Client ID"
           />
+          <p className="text-base font-semibold">Your Name:</p>
+          <Input
+            type="text"
+            onChange={(e) => setName(e.target.value)}
+            value={name}
+            placeholder="This will be used to sign off your email reply"
+          />
 
           <Button
             onClick={() => {
@@ -35,6 +43,7 @@ export default function App() {
               browser.storage.sync.set({
                 clientId: clientId,
               });
+              browser.storage.sync.set({ name: name });
               toast({
                 title: 'Settings saved!',
                 duration: 1500,
