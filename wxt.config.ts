@@ -7,7 +7,7 @@ export default defineConfig({
     description: 'Schedule Google Calendar meetings automatically',
     name: 'Calendar Scheduler',
     version: '0.0.1',
-    permissions: ['tabs', 'activeTab', 'background', 'storage', 'scripting', 'identity'],
+    permissions: ['tabs', 'background', 'storage'],
     background: {
       service_worker: 'background.js',
       persistent: true,
@@ -20,7 +20,7 @@ export default defineConfig({
     ],
     web_accessible_resources: [
       {
-        resources: ['icon/*.png', 'images/*.svg', 'images/*.png', 'injected.js'],
+        resources: ['icon/*.png', 'images/*.svg', 'images/*.png'],
         matches: ['*://*/*'],
       },
     ],

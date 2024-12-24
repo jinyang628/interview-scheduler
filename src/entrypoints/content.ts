@@ -4,7 +4,6 @@ import '@/styles/globals.css';
 
 export default defineContentScript({
   matches: ['<all_urls>'],
-  cssInjectionMode: 'ui',
   async main(ctx) {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       switch (request.action) {
