@@ -10,6 +10,18 @@ export default function App() {
   const [clientId, setClientId] = useState<string>('');
   const [name, setName] = useState<string>('');
 
+  useEffect(() => {
+    browser.storage.sync.get('openAiKey').then((result) => {
+      setOpenAiKey(result.openAiKey || '');
+    });
+    browser.storage.sync.get('clientId').then((result) => {
+      setClientId(result.clientId || '');
+    });
+    browser.storage.sync.get('name').then((result) => {
+      setName(result.name || '');
+    });
+  }, []);
+
   return (
     <div className="flex h-screen w-full justify-center p-8">
       <Toaster />

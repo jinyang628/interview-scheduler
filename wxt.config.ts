@@ -7,14 +7,7 @@ export default defineConfig({
     description: 'Schedule Google Calendar meetings automatically',
     name: 'Calendar Scheduler',
     version: '0.0.1',
-    permissions: [
-      'tabs',
-      'activeTab',
-      'background',
-      'storage',
-      'scripting',
-      'identity',
-    ],
+    permissions: ['tabs', 'activeTab', 'background', 'storage', 'scripting', 'identity'],
     oauth2: {
       client_id: '724787516680-6c5q1imlervhdt7vrqfmrqm4q9dkae08.apps.googleusercontent.com', // Replace with your own client id
       scopes: ['https://www.googleapis.com/auth/calendar'],
