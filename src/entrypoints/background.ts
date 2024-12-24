@@ -1,6 +1,6 @@
 import { SCHEDULE_CALENDAR_EVENT_ACTION } from '@/constants/browser';
 import { createCalendarEvent } from '@/utils/calendar';
-import { invoke } from '@/utils/openai';
+import { infer } from '@/utils/inference';
 
 import { errorSchema } from '@/types/browser/base';
 import {
@@ -9,6 +9,7 @@ import {
   scheduleCalendarEventResponseSchema,
 } from '@/types/browser/scheduleCalendarEvent';
 import { CalendarEvent } from '@/types/calendar';
+import { InferenceResponse } from '@/types/inference';
 
 import { logger } from '@/lib/logger';
 
@@ -20,12 +21,11 @@ export default defineBackground(() => {
         return (async () => {
           try {
             const input = scheduleCalendarEventRequestSchema.parse(message.input);
-            const calendarEvent: CalendarEvent = await invoke(input.messages);
-            const eventId: string = await createCalendarEvent(calendarEvent);
-            logger.info('Google Calendar Event ID:', eventId);
-
+            const inferenceResponse: InferenceResponse = await infer(input.messages);
+            const eventId: string = await createCalendarEvent(inferenceResponse.calendarEvent);
             const scheduleCalendarEventResponse = scheduleCalendarEventResponseSchema.parse({
               response: responseSchema.parse({
+                reply: inferenceResponse.reply,
                 eventId: eventId,
               }),
             });

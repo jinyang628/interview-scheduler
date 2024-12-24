@@ -10,6 +10,7 @@ export const scheduleCalendarEventRequestSchema = z.object({
 export type ScheduleCalendarEventRequest = z.infer<typeof scheduleCalendarEventRequestSchema>;
 
 export const responseSchema = z.object({
+  reply: z.string(),
   eventId: z.string(),
 });
 
