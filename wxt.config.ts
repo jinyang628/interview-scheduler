@@ -4,7 +4,7 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   manifest: {
     default_locale: 'en',
-    description: 'Book Google Calendar meetings automatically',
+    description: 'Schedule Google Calendar meetings automatically',
     name: 'Calendar Scheduler',
     version: '0.0.1',
     permissions: [
@@ -13,8 +13,6 @@ export default defineConfig({
       'background',
       'storage',
       'scripting',
-      'cookies',
-      'notifications',
       'identity',
     ],
     oauth2: {
