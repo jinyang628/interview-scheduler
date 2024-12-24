@@ -8,7 +8,6 @@ import {
   scheduleCalendarEventRequestSchema,
   scheduleCalendarEventResponseSchema,
 } from '@/types/browser/scheduleCalendarEvent';
-import { CalendarEvent } from '@/types/calendar';
 import { InferenceResponse } from '@/types/inference';
 
 import { logger } from '@/lib/logger';

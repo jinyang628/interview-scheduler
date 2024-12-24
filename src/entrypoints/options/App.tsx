@@ -34,7 +34,7 @@ export default function App() {
             value={openAiKey}
             placeholder="Enter your OpenAI API key"
           />
-          <p className="text-base font-semibold">Google Calendar API Key:</p>
+          <p className="text-base font-semibold">Google Cloud Project's Client ID:</p>
           <Input
             type="password"
             onChange={(e) => setClientId(e.target.value)}

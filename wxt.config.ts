@@ -9,7 +9,7 @@ export default defineConfig({
     version: '0.0.1',
     permissions: ['tabs', 'activeTab', 'background', 'storage', 'scripting', 'identity'],
     oauth2: {
-      client_id: '724787516680-6c5q1imlervhdt7vrqfmrqm4q9dkae08.apps.googleusercontent.com', // Replace with your own client id
+      client_id: '724787516680-6c5q1imlervhdt7vrqfmrqm4q9dkae08.apps.googleusercontent.com',
       scopes: ['https://www.googleapis.com/auth/calendar'],
     },
     background: {
