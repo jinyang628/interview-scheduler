@@ -22,11 +22,11 @@ export default defineBackground(() => {
           try {
             const input = scheduleCalendarEventRequestSchema.parse(message.input);
             const inferenceResponse: InferenceResponse = await infer(input.messages);
-            const eventId: string = await createCalendarEvent(inferenceResponse.calendarEvent);
+            const eventUrl: string = await createCalendarEvent(inferenceResponse.calendarEvent);
             const scheduleCalendarEventResponse = scheduleCalendarEventResponseSchema.parse({
               response: responseSchema.parse({
                 reply: inferenceResponse.reply,
-                eventId: eventId,
+                eventUrl: eventUrl,
               }),
             });
             logger.info('Schedule Calendar Event response:', scheduleCalendarEventResponse);

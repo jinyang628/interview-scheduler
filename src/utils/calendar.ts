@@ -20,6 +20,12 @@ async function getAuthToken(): Promise<string> {
   }
 }
 
+function constructEventUrl(eventStartDateTime: string): string {
+  const date = eventStartDateTime.split('T')[0];
+  const [year, month, day] = date.split('-');
+  return `https://calendar.google.com/calendar/u/1/r/day/${year}/${month}/${day}`;
+}
+
 export async function createCalendarEvent(event: CalendarEvent): Promise<string> {
   logger.info('Creating calendar event:', event.summary);
 
@@ -51,7 +57,8 @@ export async function createCalendarEvent(event: CalendarEvent): Promise<string>
     }
 
     logger.info('Successfully created calendar event with ID:', data.id);
-    return data.id;
+
+    return constructEventUrl(data.start.dateTime);
   } catch (error) {
     logger.error('Error creating calendar event:', error as Error);
     throw error;

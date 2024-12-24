@@ -11,7 +11,7 @@ export type ScheduleCalendarEventRequest = z.infer<typeof scheduleCalendarEventR
 
 export const responseSchema = z.object({
   reply: z.string(),
-  eventId: z.string(),
+  eventUrl: z.string(),
 });
 
 export const scheduleCalendarEventResponseSchema = z

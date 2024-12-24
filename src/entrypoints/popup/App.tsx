@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 
 import { extractHtmlResponseSchema } from '@/types/browser/extractHtml';
 import {
+  ScheduleCalendarEventResponse,
   scheduleCalendarEventRequestSchema,
   scheduleCalendarEventResponseSchema,
 } from '@/types/browser/scheduleCalendarEvent';
@@ -19,7 +20,8 @@ import '@/styles/globals.css';
 type SchedulingStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export default function App() {
-  const [emailReply, setEmailReply] = useState('');
+  const [scheduleCalendarEventResponse, setScheduleCalendarEventResponse] =
+    useState<ScheduleCalendarEventResponse | null>(null);
   const [schedulingStatus, setSchedulingStatus] = useState<SchedulingStatus>('idle');
   const bookMeeting = async () => {
     setSchedulingStatus('loading');
@@ -45,7 +47,7 @@ export default function App() {
           input: input,
         }),
       );
-      setEmailReply(scheduleCalendarEventResponse.response!.reply);
+      setScheduleCalendarEventResponse(scheduleCalendarEventResponse);
       setSchedulingStatus('success');
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -67,7 +69,7 @@ export default function App() {
         </>
       ) : (
         <div className="mx-5">
-          <CopyableText text={emailReply} />
+          <CopyableText text={scheduleCalendarEventResponse?.response!.reply || ''} />
         </div>
       )}
 
@@ -81,9 +83,22 @@ export default function App() {
           {schedulingStatus === 'success' ? 'Meeting Booked!' : 'Error scheduling meeting!'}
         </p>
         <p className="text-sm">
-          {schedulingStatus === 'success'
-            ? 'Meting details are in your calendar.'
-            : 'Refresh the page and try again.'}
+          {schedulingStatus === 'success' ? (
+            <>
+              Meeting details are in your{' '}
+              <a
+                href={scheduleCalendarEventResponse?.response!.eventUrl || ''}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                calendar
+              </a>
+              .
+            </>
+          ) : (
+            'Refresh the page and try again.'
+          )}
         </p>
       </div>
     </div>
