@@ -60,18 +60,17 @@ export default function App() {
   return (
     // This should be the only container with hard coded width and height
     <div className="flex h-[400px] w-[400px] flex-col items-center justify-center space-y-5">
-      <Button
-        style={{
-          display: ['idle', 'loading', 'error'].includes(schedulingStatus) ? 'initial' : 'none',
-        }}
-        onClick={bookMeeting}
-      >
-        Book Meeting!
-      </Button>
-      <Loader isLoading={schedulingStatus === 'loading'} />
-      <div className="mx-5">
-        <CopyableText text={emailReply} />
-      </div>
+      {['idle', 'loading', 'error'].includes(schedulingStatus) ? (
+        <>
+          <Button onClick={bookMeeting}>Book Meeting!</Button>
+          <Loader isLoading={schedulingStatus === 'loading'} />
+        </>
+      ) : (
+        <div className="mx-5">
+          <CopyableText text={emailReply} />
+        </div>
+      )}
+
       <div
         className="text-center"
         style={{ opacity: ['success', 'error'].includes(schedulingStatus) ? 1 : 0 }}
@@ -84,7 +83,7 @@ export default function App() {
         <p className="text-sm">
           {schedulingStatus === 'success'
             ? 'Meting details are in your calendar.'
-            : 'Please try again later.'}
+            : 'Refresh the page and try again.'}
         </p>
       </div>
     </div>
