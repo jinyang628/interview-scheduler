@@ -7,8 +7,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Toaster } from '@/components/ui/toaster';
 
-// Add this import at the top
-
 export default function App() {
   const [openAiKey, setOpenAiKey] = useState<string>('');
   const [clientId, setClientId] = useState<string>('');
@@ -54,7 +52,7 @@ export default function App() {
           />
 
           <Button className="gap-2">
-            <FcGoogle className="h-5 w-5" />
+            <FaGoogle className="h-5 w-5" />
             Authenticate with Google
           </Button>
 
