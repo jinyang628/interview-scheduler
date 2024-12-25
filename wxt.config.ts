@@ -14,7 +14,7 @@ export default defineConfig({
     },
     content_scripts: [
       {
-        matches: ['*://mail.google.*/*'],
+        matches: ['<all_urls>'], // TODO: Check exact matching regex for gmail
         js: ['/content-scripts/content.js'],
       },
     ],

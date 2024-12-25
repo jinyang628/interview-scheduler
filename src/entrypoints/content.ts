@@ -3,7 +3,7 @@ import { EXTRACT_HTML_ACTION } from '@/constants/browser';
 import '@/styles/globals.css';
 
 export default defineContentScript({
-  matches: ['*://mail.google.*/*'],
+  matches: ['<all_urls>'], // TODO: Check exact matching regex for gmail
   async main(ctx) {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       switch (request.action) {

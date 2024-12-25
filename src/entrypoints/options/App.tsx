@@ -1,6 +1,9 @@
 import { FaGoogle } from 'react-icons/fa';
 
 import { toast } from '@/hooks/use-toast';
+import getAccessToken from '@/utils/auth';
+import { CheckCircle } from 'lucide-react';
+import { XCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -11,6 +14,7 @@ export default function App() {
   const [openAiKey, setOpenAiKey] = useState<string>('');
   const [clientId, setClientId] = useState<string>('');
   const [name, setName] = useState<string>('');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     browser.storage.sync.get('openAiKey').then((result) => {
@@ -22,7 +26,25 @@ export default function App() {
     browser.storage.sync.get('name').then((result) => {
       setName(result.name || '');
     });
+    browser.storage.sync.get('isAuthenticated').then((result) => {
+      setIsAuthenticated(result.isAuthenticated || false);
+    });
   }, []);
+
+  const handleAuthentication = async () => {
+    try {
+      const accessToken = await getAccessToken({
+        clientId: await browser.storage.sync.get('clientId').then((result) => result.clientId),
+        scopes: ['https://www.googleapis.com/auth/calendar'],
+        interactive: true,
+      });
+      browser.storage.sync.set({ accessToken: accessToken });
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error(error);
+      setIsAuthenticated(false);
+    }
+  };
 
   return (
     <div className="flex h-screen w-full justify-center p-8">
@@ -51,10 +73,17 @@ export default function App() {
             placeholder="This will be used to sign off your email reply"
           />
 
-          <Button className="gap-2">
-            <FaGoogle className="h-5 w-5" />
-            Authenticate with Google
-          </Button>
+          <div className="flex items-center justify-between">
+            <Button className="gap-2" onClick={handleAuthentication}>
+              <FaGoogle className="h-5 w-5" />
+              Authenticate with Google
+            </Button>
+            {isAuthenticated ? (
+              <CheckCircle className="h-6 w-6 text-green-500" />
+            ) : (
+              <XCircle className="h-6 w-6 text-red-500" />
+            )}
+          </div>
 
           <Button
             onClick={() => {
