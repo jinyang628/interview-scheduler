@@ -14,7 +14,7 @@ export default defineConfig({
     },
     content_scripts: [
       {
-        matches: ['<all_urls>'],
+        matches: ['*://mail.google.*/*'],
         js: ['/content-scripts/content.js'],
       },
     ],

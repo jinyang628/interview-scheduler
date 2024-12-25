@@ -1,9 +1,13 @@
+import { FaGoogle } from 'react-icons/fa';
+
 import { toast } from '@/hooks/use-toast';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Toaster } from '@/components/ui/toaster';
+
+// Add this import at the top
 
 export default function App() {
   const [openAiKey, setOpenAiKey] = useState<string>('');
@@ -48,6 +52,11 @@ export default function App() {
             value={name}
             placeholder="This will be used to sign off your email reply"
           />
+
+          <Button className="gap-2">
+            <FcGoogle className="h-5 w-5" />
+            Authenticate with Google
+          </Button>
 
           <Button
             onClick={() => {
