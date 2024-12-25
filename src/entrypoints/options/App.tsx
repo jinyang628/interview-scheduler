@@ -73,7 +73,7 @@ export default function App() {
             placeholder="This will be used to sign off your email reply"
           />
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center space-x-2">
             <Button className="gap-2" onClick={handleAuthentication}>
               <FaGoogle className="h-5 w-5" />
               Authenticate with Google
