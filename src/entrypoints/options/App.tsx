@@ -74,7 +74,7 @@ export default function App() {
           />
 
           <div className="flex items-center justify-center space-x-2">
-            <Button className="gap-2" onClick={handleAuthentication}>
+            <Button className="gap-2" disabled={!clientId} onClick={handleAuthentication}>
               <FaGoogle className="h-5 w-5" />
               Authenticate with Google
             </Button>
