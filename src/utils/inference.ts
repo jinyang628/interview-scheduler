@@ -8,7 +8,7 @@ const MODEL_NAME = 'gpt-4o-2024-11-20';
 
 const SYSTEM_PROMPT = `You have 2 tasks.
 
-1. Extract the calendar event information given the context of the email content. If a zoom/microsoft/google meetig link is specified in the email, you must include it clearly in the description of your response.
+1. Extract the calendar event information given the context of the email content. If a zoom/microsoft/google meeting link or hackkerank/codepair link is specified in the email, you must include it clearly in the description of your response.
 
 2. Provide a short, polite email reply to the sender acknowledging the meeting. You should INCLUDE the "Dear [SENDER NAME],\n" prefix but OMIT the "Best regards..." suffix in your reply.`;
 
