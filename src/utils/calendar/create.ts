@@ -1,10 +1,10 @@
 import constructEventUrl from '@/utils/calendar/base';
 
-import { CalendarEvent } from '@/types/calendar';
+import { CalendarEvent } from '@/types/calendar/base';
 
 import { logger } from '@/lib/logger';
 
-export async function createCalendarEvent(event: CalendarEvent): Promise<string> {
+export default async function createCalendarEvent(event: CalendarEvent): Promise<string> {
   logger.info('Creating calendar event:', event.summary);
 
   try {

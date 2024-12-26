@@ -1,21 +1,25 @@
 import { z } from 'zod';
 
-import { CalendarEvent, calendarEventSchema } from '@/types/calendar';
+import { CalendarEvent, calendarEventSchema } from '@/types/calendar/base';
 
 import { logger } from '@/lib/logger';
 
 type CalendarEventFilterParameters = {
-  startDateTime: string;
-  endDateTime: string;
+  startDateBoundary: Date;
+  endDateBoundary: Date;
 };
 
-export async function getCalendarEvents({
-  startDateTime,
-  endDateTime,
+export default async function getCalendarEvents({
+  startDateBoundary,
+  endDateBoundary,
 }: CalendarEventFilterParameters): Promise<CalendarEvent[]> {
+  /**
+   * Retrieves all calendar events between the start date and end date boundaries.
+   */
+
   const params = new URLSearchParams({
-    timeMin: new Date(startDateTime).toISOString(),
-    timeMax: new Date(endDateTime).toISOString(),
+    timeMin: startDateBoundary.toISOString(),
+    timeMax: endDateBoundary.toISOString(),
     singleEvents: 'true',
     orderBy: 'startTime',
   });
@@ -40,32 +44,4 @@ export async function getCalendarEvents({
   const data = await response.json();
   const parsedEvents = z.array(calendarEventSchema).parse(data.items);
   return parsedEvents;
-}
-
-export async function isTimeSlotAvailable(event: CalendarEvent): Promise<boolean> {
-  const startDateTime = event.start.dateTime;
-  const endDateTime = event.end.dateTime;
-
-  const startDate = new Date(startDateTime);
-  const endDate = new Date(endDateTime);
-
-  const currentDate = new Date();
-
-  // if (currentDate < startDate || currentDate > endDate) {
-  //   // TODO: Consider raising special errors that can be easily handled by the LLM
-  //   throw new Error('Current date is not within the time slot');
-  // }
-
-  if (endDate <= startDate) {
-    // TODO: Consider raising special errors that can be easily handled by the LLM
-    throw new Error('End date cannot be before start date');
-  }
-
-  const events: CalendarEvent[] = await getCalendarEvents({ startDateTime, endDateTime });
-  if (events.length > 0) {
-    logger.info('Time slot is already booked');
-    return false;
-  }
-
-  return true;
 }

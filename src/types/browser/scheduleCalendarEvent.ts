@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { errorSchema } from '@/types/browser/base';
+import { scheduleEventResponseSchema } from '@/types/calendar/schedule';
 import { messageSchema } from '@/types/email';
 
 export const scheduleCalendarEventRequestSchema = z.object({
@@ -9,14 +10,9 @@ export const scheduleCalendarEventRequestSchema = z.object({
 
 export type ScheduleCalendarEventRequest = z.infer<typeof scheduleCalendarEventRequestSchema>;
 
-export const responseSchema = z.object({
-  reply: z.string(),
-  eventUrl: z.string(),
-});
-
 export const scheduleCalendarEventResponseSchema = z
   .object({
-    response: responseSchema.optional(),
+    response: scheduleEventResponseSchema.optional(),
     error: errorSchema.optional(),
   })
   .refine((data) => data.response || data.error, {

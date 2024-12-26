@@ -1,14 +1,16 @@
 import { z } from 'zod';
 
-export const dateTimeSchema = z.object({
-  dateTime: z.string(),
+export const timeslotSchema = z.object({
+  startDateTime: z.string(),
+  endDateTime: z.string(),
 });
+
+export type Timeslot = z.infer<typeof timeslotSchema>;
 
 export const calendarEventSchema = z.object({
   summary: z.string(),
   description: z.string(),
-  start: dateTimeSchema,
-  end: dateTimeSchema,
+  timeslot: timeslotSchema,
 });
 
 export type CalendarEvent = z.infer<typeof calendarEventSchema>;
