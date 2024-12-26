@@ -7,7 +7,7 @@ export default defineConfig({
     description: 'Schedule Google Calendar meetings automatically',
     name: 'Calendar Scheduler',
     version: '0.0.1',
-    permissions: ['tabs', 'background', 'storage'],
+    permissions: ['tabs', 'background', 'storage', 'identity'],
     background: {
       service_worker: 'background.js',
       persistent: true,
