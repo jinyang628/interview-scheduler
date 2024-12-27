@@ -6,7 +6,12 @@ import {
   VALID_TIME_SLOT_SYSTEM_PROMPT,
 } from '@/utils/inference/prompts';
 
-import { CalendarEvent, Timeslot, calendarEventSchema } from '@/types/calendar/base';
+import {
+  CalendarEvent,
+  Timeslot,
+  calendarEventSchema,
+  timeslotSchema,
+} from '@/types/calendar/base';
 import {
   EMAIL_REPLY_TEMPLATE,
   ScheduleEventResponse,
@@ -18,6 +23,7 @@ import { TimeslotValidity, timeslotValiditySchema } from '@/types/calendar/valid
 import { InferenceConfig } from '@/types/config';
 import { EmailMessage } from '@/types/email';
 import { role } from '@/types/inference';
+import { logger } from '@/lib/logger';
 
 type ScheduleCalendarEventProps = {
   messages: EmailMessage[];
@@ -69,6 +75,7 @@ export default async function scheduleCalendarEvent({
       busyTimeslots = await getAdjacentBusyTimeslots({
         initialTimeslot: initialTimeslot,
       });
+      logger.info("~Inferring timeslots to reschedule to~")
       const rescheduleTimeslotResponse = await client.infer({
         messages: [
           {
@@ -84,11 +91,16 @@ export default async function scheduleCalendarEvent({
         ],
         responseFormat: rescheduleTimeSlotResponseSchema,
       });
+      console.log("RESCHEDULE TIMESLOT RESPONSE");
+      console.log(rescheduleTimeslotResponse);
       createCalendarEventRequest = calendarEventSchema.parse({
         summary: rescheduleTimeslotResponse.summary,
         description: rescheduleTimeslotResponse.description,
-        timeslot: rescheduleTimeslotResponse.timeslot,
+        start: rescheduleTimeslotResponse.timeslot.start,
+        end: rescheduleTimeslotResponse.timeslot.end,
       });
+      console.log("CREATE CALENDAR EVENT REQUEST");
+      console.log(createCalendarEventRequest);
       emailReply = rescheduleTimeslotResponse.reply;
       break;
     default:
@@ -113,11 +125,17 @@ async function getAdjacentBusyTimeslots({
   initialTimeslot,
 }: ProposeAlternativeTimeslotProps): Promise<Timeslot[]> {
   const startDateBoundary = new Date(
-    new Date(initialTimeslot.startDateTime).getTime() - 12 * 60 * 60 * 1000,
+    new Date(initialTimeslot.start.dateTime).getTime() - 12 * 60 * 60 * 1000,
   );
   const endDateBoundary = new Date(
-    new Date(initialTimeslot.startDateTime).getTime() + 12 * 60 * 60 * 1000,
+    new Date(initialTimeslot.end.dateTime).getTime() + 12 * 60 * 60 * 1000,
   );
   const events: CalendarEvent[] = await getCalendarEvents({ startDateBoundary, endDateBoundary });
-  return events.map((event) => event.timeslot);
+  const busyTimeslots: Timeslot[] = events.map((event) =>
+    timeslotSchema.parse({
+      start: event.start,
+      end: event.end,
+    }),
+  );
+  return busyTimeslots;
 }

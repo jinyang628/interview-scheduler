@@ -30,10 +30,12 @@ export default defineBackground(() => {
             let timeslotValidity: TimeslotValidity;
             let extractTimeslotResponse: ExtractTimeslotResponse;
             while (true) {
+              logger.info('~Extracting Timeslot~');
               extractTimeslotResponse = await extractTimeslot({
                 messages: input.messages,
                 inferenceConfig: INFERENCE_CONFIG,
               });
+              logger.info('~Validating Timeslot~');
               timeslotValidity = await validateTimeslot({
                 timeslot: extractTimeslotResponse.timeslot,
               });
@@ -52,13 +54,14 @@ export default defineBackground(() => {
               }
               break;
             }
-
+            logger.info('~Scheduling Event~');
             const scheduleEventResponse: ScheduleEventResponse = await scheduleCalendarEvent({
               messages: input.messages,
               timeslotValidity: timeslotValidity,
               initialTimeslot: extractTimeslotResponse.timeslot,
               inferenceConfig: INFERENCE_CONFIG,
             });
+            logger.info('Schedule Calendar Event response:', scheduleEventResponse);
 
             const scheduleCalendarEventResponse = scheduleCalendarEventResponseSchema.parse({
               response: scheduleEventResponse,

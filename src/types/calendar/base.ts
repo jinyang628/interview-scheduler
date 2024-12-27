@@ -1,16 +1,21 @@
 import { z } from 'zod';
 
+const dateTimeSchema = z.object({
+  dateTime: z.string(),
+});
+
 export const timeslotSchema = z.object({
-  startDateTime: z.string(),
-  endDateTime: z.string(),
+  start: dateTimeSchema.describe('The dateTime value of the start of the event'),
+  end: dateTimeSchema.describe('The dateTime value of the end of the event'),
 });
 
 export type Timeslot = z.infer<typeof timeslotSchema>;
 
-export const calendarEventSchema = z.object({
+// It has to be this convoluted to follow the model shape of Google Calendar in the API
+
+export const calendarEventSchema = timeslotSchema.extend({
   summary: z.string(),
   description: z.string(),
-  timeslot: timeslotSchema,
 });
 
 export type CalendarEvent = z.infer<typeof calendarEventSchema>;

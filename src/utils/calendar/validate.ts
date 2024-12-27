@@ -9,8 +9,8 @@ type ValidateTimeslotProps = {
 export default async function validateTimeslot({
   timeslot,
 }: ValidateTimeslotProps): Promise<TimeslotValidity> {
-  const startDate = new Date(timeslot.startDateTime);
-  const endDate = new Date(timeslot.endDateTime);
+  const startDate = new Date(timeslot.start.dateTime);
+  const endDate = new Date(timeslot.end.dateTime);
   const currentDate = new Date();
 
   if (endDate <= startDate) {
