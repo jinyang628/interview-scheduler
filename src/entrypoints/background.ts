@@ -1,20 +1,22 @@
 import { SCHEDULE_CALENDAR_EVENT_ACTION } from '@/constants/browser';
-import createCalendarEvent from '@/utils/calendar/create';
-import rescheduleCalendarEvent from '@/utils/calendar/reschedule';
+import scheduleCalendarEvent from '@/utils/calendar/schedule';
 import validateTimeslot from '@/utils/calendar/validate';
 import extractTimeslot from '@/utils/extract';
 
 import { errorSchema } from '@/types/browser/base';
 import {
-  responseSchema,
   scheduleCalendarEventRequestSchema,
   scheduleCalendarEventResponseSchema,
 } from '@/types/browser/scheduleCalendarEvent';
+import { ScheduleEventResponse } from '@/types/calendar/schedule';
+import { TimeslotValidity } from '@/types/calendar/validate';
 import { ExtractTimeslotResponse } from '@/types/extract';
+import { InferenceConfig, defaultInferenceConfig } from '@/types/config';
 
 import { logger } from '@/lib/logger';
-import { TimeslotValidity } from '@/types/calendar/validate';
-import { ScheduleEventResponse } from '@/types/calendar/schedule';
+
+// Currently, we use the default inference config. We can define multiple different configs and choose which one to use here
+const INFERENCE_CONFIG: InferenceConfig = defaultInferenceConfig;
 
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((message, sender) => {
@@ -24,20 +26,19 @@ export default defineBackground(() => {
         return (async () => {
           try {
             const input = scheduleCalendarEventRequestSchema.parse(message.input);
-            const extractTimeslotResponse: ExtractTimeslotResponse = await extractTimeslot(
-              input.messages,
-            );
+            const extractTimeslotResponse: ExtractTimeslotResponse = await extractTimeslot({
+              messages: input.messages,
+              inferenceConfig: INFERENCE_CONFIG,
+            });
             const timeslotValidity: TimeslotValidity = await validateTimeslot(
               extractTimeslotResponse.timeslot,
             );
             logger.info(`Calendar Validity: ${timeslotValidity}`);
-            const scheduleEventResponse: ScheduleEventResponse = await rescheduleCalendarEvent(
+            const scheduleEventResponse: ScheduleEventResponse = await scheduleCalendarEvent(
               input.messages,
               timeslotValidity,
             );
 
-            // We always want to schedule an event even if the proposed timeslot is problematic (for manual verification + putting a calendar placeholder so we don't schedule other interviews at the same time)
-            const eventUrl: string = await createCalendarEvent(rescheduledCalendarEvent);
             const scheduleCalendarEventResponse = scheduleCalendarEventResponseSchema.parse({
               response: scheduleEventResponse,
             });

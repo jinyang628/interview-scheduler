@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 import { errorSchema } from '@/types/browser/base';
 import { scheduleEventResponseSchema } from '@/types/calendar/schedule';
-import { messageSchema } from '@/types/email';
+import { emailMessageSchema } from '@/types/email';
 
 export const scheduleCalendarEventRequestSchema = z.object({
-  messages: z.array(messageSchema),
+  messages: z.array(emailMessageSchema),
 });
 
 export type ScheduleCalendarEventRequest = z.infer<typeof scheduleCalendarEventRequestSchema>;

@@ -3,9 +3,8 @@ import getCalendarEvents from '@/utils/calendar/get';
 import {
   CalendarEvent,
   Timeslot,
-  TimeslotValidity,
-  timeslotValiditySchema,
 } from '@/types/calendar/base';
+import { TimeslotValidity, timeslotValiditySchema } from '@/types/calendar/validate';
 
 export default async function validateTimeslot(timeslot: Timeslot): Promise<TimeslotValidity> {
   const startDate = new Date(timeslot.startDateTime);

@@ -1,13 +1,13 @@
-import { Message, messageSchema } from '@/types/email';
+import { EmailMessage, emailMessageSchema } from '@/types/email';
 
 import { logger } from '@/lib/logger';
 
-export function extractEmail(html: string): Message[] {
+export function extractEmail(html: string): EmailMessage[] {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
   const messagesDivs = doc.querySelectorAll('div[class="gs"]');
-  const messages: Message[] = [];
+  const messages: EmailMessage[] = [];
   for (const messageDiv of messagesDivs) {
     const contactInfoh3 = messageDiv.querySelector('h3.iw.gFxsud');
     if (!contactInfoh3) {
@@ -47,7 +47,7 @@ export function extractEmail(html: string): Message[] {
       logger.error('Content not found');
       continue;
     }
-    const message = messageSchema.parse({
+    const message = emailMessageSchema.parse({
       name: name,
       email: email,
       content: content.trim().replace(/\s+/g, ' '),

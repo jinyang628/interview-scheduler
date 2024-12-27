@@ -11,7 +11,7 @@ import {
   scheduleCalendarEventRequestSchema,
   scheduleCalendarEventResponseSchema,
 } from '@/types/browser/scheduleCalendarEvent';
-import { Message } from '@/types/email';
+import { EmailMessage } from '@/types/email';
 
 import { logger } from '@/lib/logger';
 
@@ -36,7 +36,7 @@ export default function App() {
           action: EXTRACT_HTML_ACTION,
         }),
       );
-      const messages: Message[] = extractEmail(extractHtmlResponse.html);
+      const messages: EmailMessage[] = extractEmail(extractHtmlResponse.html);
 
       const input = scheduleCalendarEventRequestSchema.parse({
         messages: messages,
