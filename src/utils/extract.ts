@@ -1,4 +1,4 @@
-import { getInferenceClient } from '@/utils/inference';
+import { getInferenceClient } from '@/utils/inference/client';
 
 import { InferenceConfig } from '@/types/config';
 import { EmailMessage } from '@/types/email';

@@ -1,12 +1,16 @@
 import createCalendarEvent from '@/utils/calendar/create';
-import { getInferenceClient } from '@/utils/inference';
+import getCalendarEvents from '@/utils/calendar/get';
+import { getInferenceClient } from '@/utils/inference/client';
+import {
+  RESCHEDULE_TIME_SLOT_SYSTEM_PROMPT,
+  VALID_TIME_SLOT_SYSTEM_PROMPT,
+} from '@/utils/inference/prompts';
 
+import { CalendarEvent, Timeslot, calendarEventSchema } from '@/types/calendar/base';
 import {
-  ScheduleCalendarEventResponse,
-  scheduleCalendarEventResponseSchema,
-} from '@/types/browser/scheduleCalendarEvent';
-import { Timeslot, calendarEventSchema } from '@/types/calendar/base';
-import {
+  EMAIL_REPLY_TEMPLATE,
+  ScheduleEventResponse,
+  rescheduleTimeSlotResponseSchema,
   scheduleEventResponseSchema,
   validTimeSlotResponseSchema,
 } from '@/types/calendar/schedule';
@@ -14,12 +18,6 @@ import { TimeslotValidity, timeslotValiditySchema } from '@/types/calendar/valid
 import { InferenceConfig } from '@/types/config';
 import { EmailMessage } from '@/types/email';
 import { role } from '@/types/inference';
-
-const VALID_TIME_SLOT_SYSTEM_PROMPT = `You have 2 tasks.
-
-1. Extract the calendar event information given the context of the email content. If a zoom/microsoft/google meeting link or hackkerank/codepair link is specified in the email, you must include it clearly in the description of your response.
-
-2. Provide a short, polite email reply to the sender acknowledging the date and time of the meeting. You should OMIT the "Best regards..." suffix in your reply.`;
 
 type ScheduleCalendarEventProps = {
   messages: EmailMessage[];
@@ -33,13 +31,16 @@ export default async function scheduleCalendarEvent({
   timeslotValidity,
   initialTimeslot,
   inferenceConfig,
-}: ScheduleCalendarEventProps): Promise<ScheduleCalendarEventResponse> {
+}: ScheduleCalendarEventProps): Promise<ScheduleEventResponse> {
   const client = await getInferenceClient(inferenceConfig);
 
   // We always want to schedule an event even if the proposed timeslot is problematic (for manual verification + putting a calendar placeholder so we don't schedule other interviews at the same time)
+  let createCalendarEventRequest: CalendarEvent;
+  let busyTimeslots: Timeslot[];
+  let emailReply: string;
   switch (timeslotValidity) {
     case timeslotValiditySchema.Values.valid:
-      const llmResponse = await client.infer({
+      const validTimeslotResponse = await client.infer({
         messages: [
           {
             role: role.Values.system,
@@ -54,43 +55,69 @@ export default async function scheduleCalendarEvent({
         ],
         responseFormat: validTimeSlotResponseSchema,
       });
-      const createCalendarEventRequest = calendarEventSchema.parse({
-        summary: llmResponse.summary,
-        description: llmResponse.description,
+      createCalendarEventRequest = calendarEventSchema.parse({
+        summary: validTimeslotResponse.summary,
+        description: validTimeslotResponse.description,
         timeslot: initialTimeslot,
       });
-      const eventUrl: string = await createCalendarEvent(createCalendarEventRequest);
-      const response = scheduleEventResponseSchema.parse({
-        eventUrl: eventUrl,
-        reply: llmResponse.reply,
-      });
-      return scheduleCalendarEventResponseSchema.parse({
-        response: response,
-      });
-
+      emailReply = validTimeslotResponse.reply;
+      break;
     case timeslotValiditySchema.Values.endDateBeforeStartDate:
       throw new Error('End date cannot be before start date');
-    case timeslotValiditySchema.Values.currentDatePastStartDate:
-      return await createCalendarEvent(messages);
-    case timeslotValiditySchema.Values.booked:
-      return await createCalendarEvent(messages);
+    case timeslotValiditySchema.Values.currentDatePastStartDate ||
+      timeslotValiditySchema.Values.booked:
+      busyTimeslots = await getAdjacentBusyTimeslots({
+        initialTimeslot: initialTimeslot,
+      });
+      const rescheduleTimeslotResponse = await client.infer({
+        messages: [
+          {
+            role: role.Values.system,
+            content: RESCHEDULE_TIME_SLOT_SYSTEM_PROMPT(busyTimeslots.join('\n')),
+          },
+          {
+            role: role.Values.user,
+            content: messages
+              .map((msg) => `From: ${msg.name} <${msg.email}>\n${msg.content}`)
+              .join('\n'),
+          },
+        ],
+        responseFormat: rescheduleTimeSlotResponseSchema,
+      });
+      createCalendarEventRequest = calendarEventSchema.parse({
+        summary: rescheduleTimeslotResponse.summary,
+        description: rescheduleTimeslotResponse.description,
+        timeslot: rescheduleTimeslotResponse.timeslot,
+      });
+      emailReply = rescheduleTimeslotResponse.reply;
+      break;
     default:
       throw new Error('Invalid calendar event validity');
   }
 
-  //   const startDateBoundary = new Date(startDate.getTime() - 12 * 60 * 60 * 1000);
-  //   const endDateBoundary = new Date(endDate.getTime() + 12 * 60 * 60 * 1000);
-  //   const events: CalendarEvent[] = await getCalendarEvents({ startDateBoundary, endDateBoundary });
-  // =  if (currentDate >= startDate) {
-  //     const newlyProposedCalendarEvent: CalendarEvent = await rescheduleInterview({
-  //       rescheduleReason: calendarEventValiditySchema.Values.currentDatePastStartDate,
-  //       initialEvent: event,
-  //       startDateBoundary,
-  //       endDateBoundary,
-  //     });
-  //     throw new CurrentDatePastStartDateError(
-  //       'Current date is not within the time slot. Proposing to reschedule the interview...',
-  //       newlyProposedCalendarEvent,
-  //     );
-  //   }
+  const eventUrl: string = await createCalendarEvent(createCalendarEventRequest);
+  return scheduleEventResponseSchema.parse({
+    eventUrl: eventUrl,
+    reply: EMAIL_REPLY_TEMPLATE({
+      name: await browser.storage.sync.get('name').then((result) => result.name),
+      content: emailReply,
+    }),
+  });
+}
+
+type ProposeAlternativeTimeslotProps = {
+  initialTimeslot: Timeslot;
+};
+
+async function getAdjacentBusyTimeslots({
+  initialTimeslot,
+}: ProposeAlternativeTimeslotProps): Promise<Timeslot[]> {
+  const startDateBoundary = new Date(
+    new Date(initialTimeslot.startDateTime).getTime() - 12 * 60 * 60 * 1000,
+  );
+  const endDateBoundary = new Date(
+    new Date(initialTimeslot.startDateTime).getTime() + 12 * 60 * 60 * 1000,
+  );
+  const events: CalendarEvent[] = await getCalendarEvents({ startDateBoundary, endDateBoundary });
+  return events.map((event) => event.timeslot);
 }
