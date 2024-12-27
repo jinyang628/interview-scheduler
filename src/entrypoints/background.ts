@@ -9,9 +9,9 @@ import {
   scheduleCalendarEventResponseSchema,
 } from '@/types/browser/scheduleCalendarEvent';
 import { ScheduleEventResponse } from '@/types/calendar/schedule';
-import { TimeslotValidity } from '@/types/calendar/validate';
-import { ExtractTimeslotResponse } from '@/types/extract';
+import { TimeslotValidity, timeslotValiditySchema } from '@/types/calendar/validate';
 import { InferenceConfig, defaultInferenceConfig } from '@/types/config';
+import { ExtractTimeslotResponse } from '@/types/extract';
 
 import { logger } from '@/lib/logger';
 
@@ -21,23 +21,44 @@ const INFERENCE_CONFIG: InferenceConfig = defaultInferenceConfig;
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((message, sender) => {
     // Return a promise that resolves with our response
+    let retryCounter: number = 0;
     switch (message.action) {
       case SCHEDULE_CALENDAR_EVENT_ACTION:
         return (async () => {
           try {
             const input = scheduleCalendarEventRequestSchema.parse(message.input);
-            const extractTimeslotResponse: ExtractTimeslotResponse = await extractTimeslot({
+            let timeslotValidity: TimeslotValidity;
+            let extractTimeslotResponse: ExtractTimeslotResponse;
+            while (true) {
+              extractTimeslotResponse = await extractTimeslot({
+                messages: input.messages,
+                inferenceConfig: INFERENCE_CONFIG,
+              });
+              timeslotValidity = await validateTimeslot({
+                timeslot: extractTimeslotResponse.timeslot,
+              });
+              logger.info(`Calendar Validity: ${timeslotValidity}`);
+              if (timeslotValidity === timeslotValiditySchema.Values.endDateBeforeStartDate) {
+                if (retryCounter >= INFERENCE_CONFIG.retryAttempts) {
+                  throw new Error(
+                    `Failed to infer the calendar event after ${INFERENCE_CONFIG.retryAttempts} retries`,
+                  );
+                }
+                retryCounter++;
+                logger.info(
+                  `Retrying inference request ${retryCounter} of ${INFERENCE_CONFIG.retryAttempts} because LLM gave an end date that is before the start date.`,
+                );
+                continue;
+              }
+              break;
+            }
+
+            const scheduleEventResponse: ScheduleEventResponse = await scheduleCalendarEvent({
               messages: input.messages,
+              timeslotValidity: timeslotValidity,
+              initialTimeslot: extractTimeslotResponse.timeslot,
               inferenceConfig: INFERENCE_CONFIG,
             });
-            const timeslotValidity: TimeslotValidity = await validateTimeslot(
-              extractTimeslotResponse.timeslot,
-            );
-            logger.info(`Calendar Validity: ${timeslotValidity}`);
-            const scheduleEventResponse: ScheduleEventResponse = await scheduleCalendarEvent(
-              input.messages,
-              timeslotValidity,
-            );
 
             const scheduleCalendarEventResponse = scheduleCalendarEventResponseSchema.parse({
               response: scheduleEventResponse,

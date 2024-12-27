@@ -17,7 +17,7 @@ export default async function extractTimeslot({
   inferenceConfig,
 }: ExtractTimeslotProps): Promise<ExtractTimeslotResponse> {
   const client = await getInferenceClient(inferenceConfig);
-  const response = await client.infer<ExtractTimeslotResponse>({
+  const response = await client.infer({
     messages: [
       {
         role: role.Values.system,
@@ -25,10 +25,9 @@ export default async function extractTimeslot({
       },
       {
         role: role.Values.user,
-        content: messages.map((msg) => ({
-          type: 'text',
-          text: `From: ${msg.name} <${msg.email}>\n${msg.content}`,
-        })),
+        content: messages
+          .map((msg) => `From: ${msg.name} <${msg.email}>\n${msg.content}`)
+          .join('\n'),
       },
     ],
     responseFormat: extractTimeslotResponseSchema,

@@ -8,4 +8,3 @@ export const timeslotValiditySchema = z.enum([
 ]);
 
 export type TimeslotValidity = z.infer<typeof timeslotValiditySchema>;
-

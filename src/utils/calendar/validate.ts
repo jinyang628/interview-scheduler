@@ -1,12 +1,14 @@
 import getCalendarEvents from '@/utils/calendar/get';
 
-import {
-  CalendarEvent,
-  Timeslot,
-} from '@/types/calendar/base';
+import { CalendarEvent, Timeslot } from '@/types/calendar/base';
 import { TimeslotValidity, timeslotValiditySchema } from '@/types/calendar/validate';
 
-export default async function validateTimeslot(timeslot: Timeslot): Promise<TimeslotValidity> {
+type ValidateTimeslotProps = {
+  timeslot: Timeslot;
+};
+export default async function validateTimeslot({
+  timeslot,
+}: ValidateTimeslotProps): Promise<TimeslotValidity> {
   const startDate = new Date(timeslot.startDateTime);
   const endDate = new Date(timeslot.endDateTime);
   const currentDate = new Date();
