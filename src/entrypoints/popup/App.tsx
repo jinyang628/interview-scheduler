@@ -23,7 +23,33 @@ export default function App() {
   const [scheduleCalendarEventResponse, setScheduleCalendarEventResponse] =
     useState<ScheduleCalendarEventResponse | null>(null);
   const [schedulingStatus, setSchedulingStatus] = useState<SchedulingStatus>('idle');
+  const canBookMeeting = async (): Promise<boolean> => {
+    if (
+      await browser.storage.sync.get('isAuthenticated').then((result) => !result.isAuthenticated)
+    ) {
+      logger.error('User is not authenticated');
+      return false;
+    }
+    if (await browser.storage.sync.get('clientId').then((result) => !result.clientId)) {
+      logger.error('Client ID is not set');
+      return false;
+    }
+    if (await browser.storage.sync.get('name').then((result) => !result.name)) {
+      logger.error('Name is not set');
+      return false;
+    }
+    if (await browser.storage.sync.get('openAiKey').then((result) => !result.openAiKey)) {
+      logger.error('OpenAI API key is not set');
+      return false;
+    }
+
+    return true;
+  };
   const bookMeeting = async () => {
+    if (!(await canBookMeeting())) {
+      return;
+    }
+
     setSchedulingStatus('loading');
     try {
       const [tab] = await browser.tabs.query({
