@@ -23,6 +23,7 @@ import { TimeslotValidity, timeslotValiditySchema } from '@/types/calendar/valid
 import { InferenceConfig } from '@/types/config';
 import { EmailMessage } from '@/types/email';
 import { role } from '@/types/inference';
+
 import { logger } from '@/lib/logger';
 
 type ScheduleCalendarEventProps = {
@@ -75,7 +76,7 @@ export default async function scheduleCalendarEvent({
       busyTimeslots = await getAdjacentBusyTimeslots({
         initialTimeslot: initialTimeslot,
       });
-      logger.info("~Inferring timeslots to reschedule to~")
+      logger.info('~Inferring timeslots to reschedule to~');
       const rescheduleTimeslotResponse = await client.infer({
         messages: [
           {
@@ -91,7 +92,7 @@ export default async function scheduleCalendarEvent({
         ],
         responseFormat: rescheduleTimeSlotResponseSchema,
       });
-      console.log("RESCHEDULE TIMESLOT RESPONSE");
+      console.log('RESCHEDULE TIMESLOT RESPONSE');
       console.log(rescheduleTimeslotResponse);
       createCalendarEventRequest = calendarEventSchema.parse({
         summary: rescheduleTimeslotResponse.summary,
@@ -99,7 +100,7 @@ export default async function scheduleCalendarEvent({
         start: rescheduleTimeslotResponse.timeslot.start,
         end: rescheduleTimeslotResponse.timeslot.end,
       });
-      console.log("CREATE CALENDAR EVENT REQUEST");
+      console.log('CREATE CALENDAR EVENT REQUEST');
       console.log(createCalendarEventRequest);
       emailReply = rescheduleTimeslotResponse.reply;
       break;

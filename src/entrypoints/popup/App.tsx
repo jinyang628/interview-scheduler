@@ -1,3 +1,5 @@
+import { IoReload } from 'react-icons/io5';
+
 import { EXTRACT_HTML_ACTION, SCHEDULE_CALENDAR_EVENT_ACTION } from '@/constants/browser';
 import { extractEmail } from '@/utils/email';
 
@@ -94,9 +96,13 @@ export default function App() {
           <Loader isLoading={schedulingStatus === 'loading'} />
         </>
       ) : (
-        <div className="mx-5">
-          <CopyableText text={scheduleCalendarEventResponse?.response!.reply || ''} />
-        </div>
+        <>
+          {/* TODO: Add refresh functionality (might need to rework the expected UI of diff schedulingStatus) */}
+          <IoReload />
+          <div className="mx-5">
+            <CopyableText text={scheduleCalendarEventResponse?.response!.reply || ''} />
+          </div>
+        </>
       )}
 
       <div
