@@ -6,6 +6,7 @@ import { extractEmail } from '@/utils/email';
 import CopyableText from '@/components/shared/copyable-text';
 import Loader from '@/components/shared/loader';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { extractHtmlResponseSchema } from '@/types/browser/extractHtml';
 import {
@@ -56,6 +57,7 @@ export default function App() {
       return false;
     }
 
+    setErrorMessage(msg);
     return true;
   };
 
@@ -99,8 +101,6 @@ export default function App() {
     }
   };
 
-  console.log(errorMessage);
-
   return (
     // This should be the only container with hard coded width and height
     <div className="flex h-[400px] w-[400px] flex-col items-center justify-center space-y-5">
@@ -118,9 +118,9 @@ export default function App() {
         <>
           {/* TODO: Add refresh functionality (might need to rework the expected UI of diff schedulingStatus) */}
           <IoReload />
-          <div className="mx-5">
+          <ScrollArea className="h-[80%] w-[80%]">
             <CopyableText text={scheduleCalendarEventResponse?.response!.reply || ''} />
-          </div>
+          </ScrollArea>
         </>
       )}
 
