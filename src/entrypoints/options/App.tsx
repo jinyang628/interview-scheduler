@@ -34,37 +34,46 @@ export default function App() {
       browser.storage.sync.get('name').then((result) => {
         setName(result.name || '');
       });
-      const accessToken: string = await browser.storage.sync
-        .get('accessToken')
-        .then((result) => result.accessToken)
-        .catch(() => '');
+      try {
+        const accessToken: string = await browser.storage.sync
+          .get('accessToken')
+          .then((result) => result.accessToken)
+          .catch(() => '');
 
-      const isValid = await isAccessTokenValid(accessToken);
-      if (isValid) {
+        const isValid = await isAccessTokenValid(accessToken);
+        if (isValid) {
+          setIsAuthenticated(true);
+        }
+
+        const refreshToken: string = await browser.storage.sync
+          .get('refreshToken')
+          .then((result) => result.refreshToken)
+          .catch(() => '');
+        const clientId: string = await browser.storage.sync
+          .get('clientId')
+          .then((result) => result.clientId)
+          .catch(() => '');
+
+        await browser.storage.sync.set({
+          accessToken: await refreshAccessToken({
+            refreshToken: refreshToken,
+            clientId: clientId,
+          }),
+        });
         setIsAuthenticated(true);
+      } catch (error: unknown) {
+        logger.error('Error initializing states:', error as Error);
+        setIsAuthenticated(false);
       }
-
-      const refreshToken: string = await browser.storage.sync
-        .get('refreshToken')
-        .then((result) => result.refreshToken)
-        .catch(() => '');
-      const clientId: string = await browser.storage.sync
-        .get('clientId')
-        .then((result) => result.clientId)
-        .catch(() => '');
-
-      await browser.storage.sync.set({
-        accessToken: await refreshAccessToken({
-          refreshToken: refreshToken,
-          clientId: clientId,
-        }),
-      });
-
-      setIsAuthenticated(true);
     };
 
     initializeStates();
   }, []);
+
+
+  useEffect(() => {
+    browser.storage.sync.set({ isAuthenticated: false });
+  }, [isAuthenticated]);
 
   const handleAuthentication = async () => {
     try {
