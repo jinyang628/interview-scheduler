@@ -25,28 +25,40 @@ export default function App() {
   const [scheduleCalendarEventResponse, setScheduleCalendarEventResponse] =
     useState<ScheduleCalendarEventResponse | null>(null);
   const [schedulingStatus, setSchedulingStatus] = useState<SchedulingStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
   const canBookMeeting = async (): Promise<boolean> => {
+    let msg: string = '';
     if (
       await browser.storage.sync.get('isAuthenticated').then((result) => !result.isAuthenticated)
     ) {
-      logger.error('User is not authenticated');
+      msg = 'User is not authenticated';
+      logger.error(msg);
+      setErrorMessage(msg);
       return false;
     }
     if (await browser.storage.sync.get('clientId').then((result) => !result.clientId)) {
-      logger.error('Client ID is not set');
+      msg = 'Client ID is not set';
+      logger.error(msg);
+      setErrorMessage(msg);
       return false;
     }
     if (await browser.storage.sync.get('name').then((result) => !result.name)) {
-      logger.error('Name is not set');
+      msg = 'Name is not set';
+      logger.error(msg);
+      setErrorMessage(msg);
       return false;
     }
     if (await browser.storage.sync.get('openAiKey').then((result) => !result.openAiKey)) {
-      logger.error('OpenAI API key is not set');
+      msg = 'OpenAI API key is not set';
+      logger.error(msg);
+      setErrorMessage(msg);
       return false;
     }
 
     return true;
   };
+
   const bookMeeting = async () => {
     if (!(await canBookMeeting())) {
       return;
@@ -87,12 +99,19 @@ export default function App() {
     }
   };
 
+  console.log(errorMessage);
+
   return (
     // This should be the only container with hard coded width and height
     <div className="flex h-[400px] w-[400px] flex-col items-center justify-center space-y-5">
       {['idle', 'loading', 'error'].includes(schedulingStatus) ? (
         <>
           <Button onClick={bookMeeting}>Book Meeting!</Button>
+          <p
+            className={`text-sm italic text-red-500 ${errorMessage ? 'opacity-100' : 'opacity-0'}`}
+          >
+            {errorMessage || 'No error'}
+          </p>
           <Loader isLoading={schedulingStatus === 'loading'} />
         </>
       ) : (
