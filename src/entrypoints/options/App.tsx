@@ -1,44 +1,81 @@
 import { FaGoogle } from 'react-icons/fa';
 
 import { toast } from '@/hooks/use-toast';
-import getAccessToken from '@/utils/auth';
+import { isAccessTokenValid, refreshAccessToken, storeAuthTokens } from '@/utils/auth';
 import { CheckCircle } from 'lucide-react';
 import { XCircle } from 'lucide-react';
+import { set } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Toaster } from '@/components/ui/toaster';
 
+import { logger } from '@/lib/logger';
+
 export default function App() {
   const [openAiKey, setOpenAiKey] = useState<string>('');
   const [clientId, setClientId] = useState<string>('');
+  const [clientSecret, setClientSecret] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    browser.storage.sync.get('openAiKey').then((result) => {
-      setOpenAiKey(result.openAiKey || '');
-    });
-    browser.storage.sync.get('clientId').then((result) => {
-      setClientId(result.clientId || '');
-    });
-    browser.storage.sync.get('name').then((result) => {
-      setName(result.name || '');
-    });
-    browser.storage.sync.get('isAuthenticated').then((result) => {
-      setIsAuthenticated(result.isAuthenticated || false);
-    });
+    const initializeStates = async () => {
+      browser.storage.sync.get('openAiKey').then((result) => {
+        setOpenAiKey(result.openAiKey || '');
+      });
+      browser.storage.sync.get('clientId').then((result) => {
+        setClientId(result.clientId || '');
+      });
+      browser.storage.sync.get('clientSecret').then((result) => {
+        setClientSecret(result.clientSecret || '');
+      });
+      browser.storage.sync.get('name').then((result) => {
+        setName(result.name || '');
+      });
+      const accessToken: string = await browser.storage.sync
+        .get('accessToken')
+        .then((result) => result.accessToken)
+        .catch(() => '');
+
+      const isValid = await isAccessTokenValid(accessToken);
+      if (isValid) {
+        setIsAuthenticated(true);
+      }
+
+      const refreshToken: string = await browser.storage.sync
+        .get('refreshToken')
+        .then((result) => result.refreshToken)
+        .catch(() => '');
+      const clientId: string = await browser.storage.sync
+        .get('clientId')
+        .then((result) => result.clientId)
+        .catch(() => '');
+
+      await browser.storage.sync.set({
+        accessToken: await refreshAccessToken({
+          refreshToken: refreshToken,
+          clientId: clientId,
+        }),
+      });
+
+      setIsAuthenticated(true);
+    };
+
+    initializeStates();
   }, []);
 
   const handleAuthentication = async () => {
     try {
-      const accessToken = await getAccessToken({
+      await storeAuthTokens({
         clientId: await browser.storage.sync.get('clientId').then((result) => result.clientId),
+        clientSecret: await browser.storage.sync
+          .get('clientSecret')
+          .then((result) => result.clientSecret),
         scopes: ['https://www.googleapis.com/auth/calendar'],
         interactive: true,
       });
-      browser.storage.sync.set({ accessToken: accessToken });
       setIsAuthenticated(true);
     } catch (error) {
       console.error(error);
@@ -65,6 +102,13 @@ export default function App() {
             value={clientId}
             placeholder="Enter your Google Cloud Project's Client ID"
           />
+          <p className="text-base font-semibold">Google Cloud Project's Client Secret:</p>
+          <Input
+            type="password"
+            onChange={(e) => setClientSecret(e.target.value)}
+            value={clientSecret}
+            placeholder="Enter your Google Cloud Project's Client Secret"
+          />
           <p className="text-base font-semibold">Your Name:</p>
           <Input
             type="text"
@@ -90,6 +134,9 @@ export default function App() {
               browser.storage.sync.set({ openAiKey: openAiKey });
               browser.storage.sync.set({
                 clientId: clientId,
+              });
+              browser.storage.sync.set({
+                clientSecret: clientSecret,
               });
               browser.storage.sync.set({ name: name });
               toast({

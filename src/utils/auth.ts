@@ -1,22 +1,28 @@
+import { StatusCodes } from 'http-status-codes';
+
 import { logger } from '@/lib/logger';
 
-interface AccessTokenOptions {
+interface StoreAuthTokensProps {
   clientId: string;
+  clientSecret: string;
   scopes: string[];
   interactive: boolean;
 }
 
-export default async function getAccessToken({
+export async function storeAuthTokens({
   clientId,
+  clientSecret,
   scopes,
   interactive,
-}: AccessTokenOptions): Promise<string> {
+}: StoreAuthTokensProps): Promise<void> {
   try {
     const authUrl = new URL('https://accounts.google.com/o/oauth2/auth');
     authUrl.searchParams.append('client_id', clientId);
-    authUrl.searchParams.append('response_type', 'token');
+    authUrl.searchParams.append('response_type', 'code');
     authUrl.searchParams.append('redirect_uri', chrome.identity.getRedirectURL());
     authUrl.searchParams.append('scope', scopes.join(' '));
+    authUrl.searchParams.append('access_type', 'offline');
+    authUrl.searchParams.append('prompt', 'consent');
     logger.info('Auth URL:', authUrl.toString());
 
     const responseUrl = await new Promise<string>((resolve, reject) => {
@@ -39,17 +45,101 @@ export default async function getAccessToken({
       );
     });
 
-    // Extract the access token from the response URL
-    const hashParams = new URLSearchParams(new URL(responseUrl).hash.slice(1));
-    const accessToken = hashParams.get('access_token');
+    // Extract the authorization code
+    const urlParams = new URLSearchParams(new URL(responseUrl).search);
+    const code = urlParams.get('code');
 
-    if (!accessToken) {
-      throw new Error('No access token found in response');
+    if (!code) {
+      throw new Error('No authorization code found in response');
     }
 
-    return accessToken;
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: chrome.identity.getRedirectURL(),
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      const errorData = await tokenResponse.json().catch(() => null);
+      logger.error('Token exchange failed:', {
+        status: tokenResponse.status,
+        statusText: tokenResponse.statusText,
+        error: errorData,
+      });
+      throw new Error(`Token exchange failed: ${tokenResponse.status}`);
+    }
+
+    const tokens = await tokenResponse.json();
+
+    if (!tokens.access_token || !tokens.refresh_token) {
+      throw new Error('Missing tokens in response');
+    }
+
+    browser.storage.sync.set({ accessToken: tokens.access_token });
+    browser.storage.sync.set({ refreshToken: tokens.refresh_token });
   } catch (error) {
-    logger.error('Error getting auth token:', error as Error);
+    logger.error('Error getting auth tokens:', error as Error);
     throw new Error('Failed to authenticate with Google Calendar');
+  }
+}
+
+interface RefreshAccessTokenProps {
+  clientId: string;
+  refreshToken: string;
+}
+
+export async function refreshAccessToken({
+  clientId,
+  refreshToken,
+}: RefreshAccessTokenProps): Promise<string> {
+  if (!refreshToken) {
+    throw new Error('No refresh token found so access token cannot be refreshed');
+  }
+  if (!clientId) {
+    throw new Error('No client ID found so access token cannot be refreshed');
+  }
+
+  try {
+    const response = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        client_id: clientId,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token',
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to refresh access token');
+    }
+
+    const data = await response.json();
+    return data.access_token;
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+    throw error;
+  }
+}
+
+export async function isAccessTokenValid(accessToken: string): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?access_token=${accessToken}`,
+    );
+    return response.status === StatusCodes.OK;
+  } catch (error: unknown) {
+    logger.error('Error checking access token validity:', error as Error);
+    return false;
   }
 }
