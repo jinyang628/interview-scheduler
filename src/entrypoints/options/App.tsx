@@ -70,7 +70,6 @@ export default function App() {
     initializeStates();
   }, []);
 
-
   useEffect(() => {
     browser.storage.sync.set({ isAuthenticated: isAuthenticated });
   }, [isAuthenticated]);
