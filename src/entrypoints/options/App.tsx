@@ -1,7 +1,7 @@
 import { FaGoogle } from 'react-icons/fa';
 
 import { toast } from '@/hooks/use-toast';
-import { isAccessTokenValid, refreshAccessToken, storeAuthTokens } from '@/utils/auth';
+import { getAuthTokens, isAccessTokenValid, refreshAccessToken } from '@/utils/auth';
 import { CheckCircle } from 'lucide-react';
 import { XCircle } from 'lucide-react';
 import { set } from 'zod';
@@ -68,13 +68,19 @@ export default function App() {
 
   const handleAuthentication = async () => {
     try {
-      await storeAuthTokens({
+      const { accessToken, refreshToken } = await getAuthTokens({
         clientId: await browser.storage.sync.get('clientId').then((result) => result.clientId),
         clientSecret: await browser.storage.sync
           .get('clientSecret')
           .then((result) => result.clientSecret),
         scopes: ['https://www.googleapis.com/auth/calendar'],
         interactive: true,
+      });
+      console.log('Access token:', accessToken);
+      console.log('Refresh token:', refreshToken);
+      await browser.storage.sync.set({
+        accessToken: accessToken,
+        refreshToken: refreshToken,
       });
       setIsAuthenticated(true);
     } catch (error) {

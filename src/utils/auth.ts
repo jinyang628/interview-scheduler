@@ -9,12 +9,17 @@ interface StoreAuthTokensProps {
   interactive: boolean;
 }
 
-export async function storeAuthTokens({
+interface StoreAuthTokensResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export async function getAuthTokens({
   clientId,
   clientSecret,
   scopes,
   interactive,
-}: StoreAuthTokensProps): Promise<void> {
+}: StoreAuthTokensProps): Promise<StoreAuthTokensResponse> {
   try {
     const authUrl = new URL('https://accounts.google.com/o/oauth2/auth');
     authUrl.searchParams.append('client_id', clientId);
@@ -83,8 +88,10 @@ export async function storeAuthTokens({
       throw new Error('Missing tokens in response');
     }
 
-    browser.storage.sync.set({ accessToken: tokens.access_token });
-    browser.storage.sync.set({ refreshToken: tokens.refresh_token });
+    return {
+      accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token,
+    };
   } catch (error) {
     logger.error('Error getting auth tokens:', error as Error);
     throw new Error('Failed to authenticate with Google Calendar');
