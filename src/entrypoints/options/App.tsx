@@ -72,7 +72,7 @@ export default function App() {
 
 
   useEffect(() => {
-    browser.storage.sync.set({ isAuthenticated: false });
+    browser.storage.sync.set({ isAuthenticated: isAuthenticated });
   }, [isAuthenticated]);
 
   const handleAuthentication = async () => {
