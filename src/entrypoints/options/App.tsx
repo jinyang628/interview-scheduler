@@ -1,11 +1,14 @@
 import { FaGoogle } from 'react-icons/fa';
 
+import { DAY_OPTIONS, TIMEZONE_OPTIONS, TIME_OPTIONS } from '@/constants/calendar';
 import { toast } from '@/hooks/use-toast';
 import { getAuthTokens, isAccessTokenValid, refreshAccessToken } from '@/utils/auth';
 import { CheckCircle } from 'lucide-react';
 import { XCircle } from 'lucide-react';
 
+import IndividualSelectDropdown from '@/components/shared/individual-select-dropdown';
 import Loader from '@/components/shared/loader';
+import MultipleSelectDropdown from '@/components/shared/multiple-select-dropdown';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,6 +21,11 @@ export default function App() {
   const [clientId, setClientId] = useState<string>('');
   const [clientSecret, setClientSecret] = useState<string>('');
   const [name, setName] = useState<string>('');
+  const [startTime, setStartTime] = useState<string>('');
+  const [endTime, setEndTime] = useState<string>('');
+  const [preferredDays, setPreferredDays] = useState<string[]>([]);
+  const [timezone, setTimezone] = useState<string>('');
+
   const [authenticationStatus, setAuthenticationStatus] = useState<AuthenticationStatus>('loading');
 
   useEffect(() => {
@@ -125,6 +133,41 @@ export default function App() {
             value={name}
             placeholder="This will be used to sign off your email reply"
           />
+          <p className="text-base font-semibold">Preferred Interview Timings:</p>
+          <div className="flex justify-around">
+            <div className="flex w-[40%] space-x-4">
+              <div className="w-[40%]">
+                <IndividualSelectDropdown
+                  name="Earliest Start Time"
+                  items={TIME_OPTIONS}
+                  selectedItem={startTime}
+                  onSelectItem={(item) => setStartTime(item)}
+                />
+              </div>
+              <p>-</p>
+              <div className="w-[40%]">
+                <IndividualSelectDropdown
+                  name="Latest End Time"
+                  items={TIME_OPTIONS}
+                  selectedItem={endTime}
+                  onSelectItem={(item) => setEndTime(item)}
+                />
+              </div>
+            </div>
+            <MultipleSelectDropdown
+              name="Preferred Days"
+              items={DAY_OPTIONS}
+              selectedItems={preferredDays}
+              onSelectItems={(items) => setPreferredDays(items)}
+              order={DAY_OPTIONS}
+            />
+            <IndividualSelectDropdown
+              name="Timezone"
+              items={TIMEZONE_OPTIONS}
+              selectedItem={timezone}
+              onSelectItem={(item) => setTimezone(item)}
+            />
+          </div>
 
           <div className="flex items-center justify-center space-x-2">
             <Button className="gap-2" disabled={!clientId} onClick={handleAuthentication}>
@@ -150,6 +193,10 @@ export default function App() {
                 clientSecret: clientSecret,
               });
               browser.storage.sync.set({ name: name });
+              browser.storage.sync.set({ startTime: startTime });
+              browser.storage.sync.set({ endTime: endTime });
+              browser.storage.sync.set({ preferredDays: preferredDays });
+              browser.storage.sync.set({ timezone: timezone });
               toast({
                 title: 'Settings saved!',
                 duration: 1500,
