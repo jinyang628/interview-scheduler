@@ -8,8 +8,21 @@ This Chrome extension automatically schedules meetings on google calendar based 
 
 ## Setup
 
-1. Chrome Web Store (PENDING)
-2. Download and load unpacked `dist/chrome-mv3` folder in chrome directly
+1. Install the extension
+    a) Install directly from the Chrome Web Store (PENDING APPROVAL)
+    b) Download and load the unpacked built extension into Chrome directly
+        - Download `interview-scheduler-vA.B.C.zip` from the [latest release](https://github.com/jinyang628/interview-scheduler/releases)
+        - Unzip the folder
+        - Navigate to `chrome://extensions/` in Chrome
+        - Toggle on `Developer mode` (Top right hand corner)
+        - Click on `Load unpacked` (Top left hand corner)
+        - Select the `dist/chrome-mv3` subfolder within the unzipped folder
+  
+2. Fill in all the required information in the options page
+
+3. Open the email you want to schedule a meeting for
+
+4. Click **Book Meeting** in the extension popup
 
 ## TODO
 
