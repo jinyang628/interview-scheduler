@@ -1,12 +1,12 @@
-name: CI checks
-
+name: Build and Release
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
-  CI-checks:
-    name: CI-checks
+  release:
+    name: Release package
     runs-on: ubuntu-latest
 
     steps:
@@ -27,8 +27,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run Prettier
-        run: npx prettier --check .
-
       - name: Run build
         run: pnpm build
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*
