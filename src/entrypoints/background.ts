@@ -8,6 +8,7 @@ import {
   scheduleCalendarEventRequestSchema,
   scheduleCalendarEventResponseSchema,
 } from '@/types/browser/scheduleCalendarEvent';
+import { PreferredTimeslots, preferredTimeslotsSchema } from '@/types/calendar/preference';
 import { ScheduleEventResponse } from '@/types/calendar/schedule';
 import { TimeslotValidity, timeslotValiditySchema } from '@/types/calendar/validate';
 import { InferenceConfig, defaultInferenceConfig } from '@/types/config';
@@ -36,8 +37,27 @@ export default defineBackground(() => {
                 inferenceConfig: INFERENCE_CONFIG,
               });
               logger.info('~Validating Timeslot~');
+              const preferredTimeslots: PreferredTimeslots = preferredTimeslotsSchema.parse({
+                earliestStartTime: await browser.storage.sync
+                  .get('startTime')
+                  .then((result) => result.startTime)
+                  .catch(() => ''),
+                latestEndTime: await browser.storage.sync
+                  .get('endTime')
+                  .then((result) => result.endTime)
+                  .catch(() => ''),
+                preferredDays: await browser.storage.sync
+                  .get('preferredDays')
+                  .then((result) => result.preferredDays)
+                  .catch(() => []),
+                timezone: await browser.storage.sync
+                  .get('timezone')
+                  .then((result) => result.timezone)
+                  .catch(() => ''),
+              });
               timeslotValidity = await validateTimeslot({
-                timeslot: extractTimeslotResponse.timeslot,
+                proposedTimeslot: extractTimeslotResponse.timeslot,
+                preferredTimeslots: preferredTimeslots,
               });
               logger.info(`Calendar Validity: ${timeslotValidity}`);
               if (timeslotValidity === timeslotValiditySchema.Values.endDateBeforeStartDate) {

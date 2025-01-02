@@ -5,6 +5,7 @@ export const timeslotValiditySchema = z.enum([
   'endDateBeforeStartDate',
   'currentDatePastStartDate',
   'booked',
+  'outsidePreferredTimeslots',
 ]);
 
 export type TimeslotValidity = z.infer<typeof timeslotValiditySchema>;

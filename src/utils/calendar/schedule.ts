@@ -92,16 +92,12 @@ export default async function scheduleCalendarEvent({
         ],
         responseFormat: rescheduleTimeSlotResponseSchema,
       });
-      console.log('RESCHEDULE TIMESLOT RESPONSE');
-      console.log(rescheduleTimeslotResponse);
       createCalendarEventRequest = calendarEventSchema.parse({
         summary: rescheduleTimeslotResponse.summary,
         description: rescheduleTimeslotResponse.description,
         start: rescheduleTimeslotResponse.timeslot.start,
         end: rescheduleTimeslotResponse.timeslot.end,
       });
-      console.log('CREATE CALENDAR EVENT REQUEST');
-      console.log(createCalendarEventRequest);
       emailReply = rescheduleTimeslotResponse.reply;
       break;
     default:
