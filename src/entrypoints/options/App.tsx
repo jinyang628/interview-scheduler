@@ -76,10 +76,8 @@ export default function App() {
   const handleAuthentication = async () => {
     try {
       const { accessToken, refreshToken } = await getAuthTokens({
-        clientId: await browser.storage.sync.get('clientId').then((result) => result.clientId),
-        clientSecret: await browser.storage.sync
-          .get('clientSecret')
-          .then((result) => result.clientSecret),
+        clientId: clientId,
+        clientSecret: clientSecret,
         scopes: ['https://www.googleapis.com/auth/calendar'],
         interactive: true,
       });
