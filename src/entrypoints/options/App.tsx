@@ -4,21 +4,21 @@ import { toast } from '@/hooks/use-toast';
 import { getAuthTokens, isAccessTokenValid, refreshAccessToken } from '@/utils/auth';
 import { CheckCircle } from 'lucide-react';
 import { XCircle } from 'lucide-react';
-import { set } from 'zod';
 
+import Loader from '@/components/shared/loader';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Toaster } from '@/components/ui/toaster';
 
-import { logger } from '@/lib/logger';
+type AuthenticationStatus = 'no' | 'yes' | 'loading' | 'error';
 
 export default function App() {
   const [openAiKey, setOpenAiKey] = useState<string>('');
   const [clientId, setClientId] = useState<string>('');
   const [clientSecret, setClientSecret] = useState<string>('');
   const [name, setName] = useState<string>('');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authenticationStatus, setAuthenticationStatus] = useState<AuthenticationStatus>('loading');
 
   useEffect(() => {
     const initializeStates = async () => {
@@ -42,37 +42,36 @@ export default function App() {
 
         const isValid = await isAccessTokenValid(accessToken);
         if (isValid) {
-          setIsAuthenticated(true);
+          setAuthenticationStatus('yes');
+          return;
         }
-
-        const refreshToken: string = await browser.storage.sync
-          .get('refreshToken')
-          .then((result) => result.refreshToken)
-          .catch(() => '');
-        const clientId: string = await browser.storage.sync
-          .get('clientId')
-          .then((result) => result.clientId)
-          .catch(() => '');
 
         await browser.storage.sync.set({
           accessToken: await refreshAccessToken({
-            refreshToken: refreshToken,
-            clientId: clientId,
+            refreshToken: await browser.storage.sync
+              .get('refreshToken')
+              .then((result) => result.refreshToken)
+              .catch(() => ''),
+            clientId: await browser.storage.sync
+              .get('clientId')
+              .then((result) => result.clientId)
+              .catch(() => ''),
+            clientSecret: await browser.storage.sync
+              .get('clientSecret')
+              .then((result) => result.clientSecret)
+              .catch(() => ''),
           }),
         });
-        setIsAuthenticated(true);
+        setAuthenticationStatus('yes');
       } catch (error: unknown) {
-        logger.error('Error initializing states:', error as Error);
-        setIsAuthenticated(false);
+        console.error(error);
+        setAuthenticationStatus('no');
       }
     };
 
+    setAuthenticationStatus('loading');
     initializeStates();
   }, []);
-
-  useEffect(() => {
-    browser.storage.sync.set({ isAuthenticated: isAuthenticated });
-  }, [isAuthenticated]);
 
   const handleAuthentication = async () => {
     try {
@@ -84,16 +83,14 @@ export default function App() {
         scopes: ['https://www.googleapis.com/auth/calendar'],
         interactive: true,
       });
-      console.log('Access token:', accessToken);
-      console.log('Refresh token:', refreshToken);
       await browser.storage.sync.set({
         accessToken: accessToken,
         refreshToken: refreshToken,
       });
-      setIsAuthenticated(true);
+      setAuthenticationStatus('yes');
     } catch (error) {
       console.error(error);
-      setIsAuthenticated(false);
+      setAuthenticationStatus('error');
     }
   };
 
@@ -133,14 +130,16 @@ export default function App() {
 
           <div className="flex items-center justify-center space-x-2">
             <Button className="gap-2" disabled={!clientId} onClick={handleAuthentication}>
-              <FaGoogle className="h-5 w-5" />
+              <FaGoogle className="size-5" />
               Authenticate with Google
             </Button>
-            {isAuthenticated ? (
-              <CheckCircle className="h-6 w-6 text-green-500" />
-            ) : (
-              <XCircle className="h-6 w-6 text-red-500" />
-            )}
+            {authenticationStatus === 'yes' ? (
+              <CheckCircle className="size-8 text-green-500" />
+            ) : authenticationStatus === 'no' || authenticationStatus === 'error' ? (
+              <XCircle className="size-8 text-red-500" />
+            ) : authenticationStatus === 'loading' ? (
+              <Loader isLoading={true} />
+            ) : null}
           </div>
 
           <Button

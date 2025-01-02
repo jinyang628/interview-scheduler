@@ -100,11 +100,13 @@ export async function getAuthTokens({
 
 interface RefreshAccessTokenProps {
   clientId: string;
+  clientSecret: string;
   refreshToken: string;
 }
 
 export async function refreshAccessToken({
   clientId,
+  clientSecret,
   refreshToken,
 }: RefreshAccessTokenProps): Promise<string> {
   if (!refreshToken) {
@@ -122,12 +124,15 @@ export async function refreshAccessToken({
       },
       body: new URLSearchParams({
         client_id: clientId,
+        client_secret: clientSecret,
         refresh_token: refreshToken,
         grant_type: 'refresh_token',
       }),
     });
 
     if (!response.ok) {
+      console.log('REFRESH RESPONSE');
+      console.log(await response.json());
       throw new Error('Failed to refresh access token');
     }
 
