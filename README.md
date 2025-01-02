@@ -10,7 +10,6 @@ This Chrome extension automatically schedules meetings on google calendar based 
 
 1. Only schedule meetings for the opened conversation
 2. Let users indicate preferences of timeslots to book/avoid
-3. Publish build package
 
 ## Notes
 
