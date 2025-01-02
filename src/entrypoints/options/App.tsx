@@ -40,7 +40,7 @@ export default function App() {
           .then((result) => result.accessToken)
           .catch(() => '');
 
-        const isValid = await isAccessTokenValid(accessToken);
+        const isValid: boolean = await isAccessTokenValid(accessToken);
         if (isValid) {
           setAuthenticationStatus('yes');
           return;

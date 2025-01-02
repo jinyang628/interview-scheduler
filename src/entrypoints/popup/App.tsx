@@ -30,9 +30,13 @@ export default function App() {
 
   const canBookMeeting = async (): Promise<boolean> => {
     let msg: string = '';
-    if (
-      await browser.storage.sync.get('isAuthenticated').then((result) => !result.isAuthenticated)
-    ) {
+    const accessToken: string = await browser.storage.sync
+      .get('accessToken')
+      .then((result) => result.accessToken)
+      .catch(() => '');
+
+    const isValid: boolean = await isAccessTokenValid(accessToken);
+    if (!isValid) {
       msg = 'User is not authenticated';
       logger.error(msg);
       setErrorMessage(msg);
