@@ -6,6 +6,11 @@ This Chrome extension automatically schedules meetings on google calendar based 
 
 ~PLACEHOLDER~
 
+## Setup
+
+1. Chrome Web Store (PENDING)
+2. Download and load unpacked `dist/chrome-mv3` folder in chrome directly
+
 ## TODO
 
 1. Only schedule meetings for the opened conversation
