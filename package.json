@@ -1,6 +1,6 @@
 {
-  "name": "wxt-react-starter",
-  "description": "manifest.json description",
+  "name": "interview-scheduler",
+  "description": "A Chrome extension that automatically schedules meetings on google calendar based on the information present in the the email content. It also helps you to draft a short appropriate reply to the sender",
   "version": "0.0.0",
   "type": "module",
   "files": [
