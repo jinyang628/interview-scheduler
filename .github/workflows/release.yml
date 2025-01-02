@@ -35,11 +35,11 @@ jobs:
       - name: Check dist folder
         run: ls -la dist
 
-      - name: Debug Environment
-        run: env
-      
+      - name: Create Chrome Extension Package
+        run: |
+          zip -r interview-scheduler-${GITHUB_REF#refs/tags/}.zip dist
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            dist/*
+          files: interview-scheduler-${GITHUB_REF#refs/tags/}.zip
