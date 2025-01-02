@@ -1,6 +1,6 @@
 import { FaGoogle } from 'react-icons/fa';
 
-import { DAY_OPTIONS, TIMEZONE_OPTIONS, TIME_OPTIONS } from '@/constants/calendar';
+import { DAY_OPTIONS, TIMEZONE_OPTIONS, TIME_OPTIONS, isValidTime } from '@/constants/calendar';
 import { toast } from '@/hooks/use-toast';
 import { getAuthTokens, isAccessTokenValid, refreshAccessToken } from '@/utils/auth';
 import { CheckCircle } from 'lucide-react';
@@ -189,10 +189,22 @@ export default function App() {
                 clientSecret: clientSecret,
               });
               browser.storage.sync.set({ name: name });
-              browser.storage.sync.set({ startTime: startTime });
-              browser.storage.sync.set({ endTime: endTime });
               browser.storage.sync.set({ preferredDays: preferredDays });
               browser.storage.sync.set({ timezone: timezone });
+              if (startTime && endTime) {
+                if (!isValidTime(startTime, endTime)) {
+                  toast({
+                    title: 'Invalid timings',
+                    description: 'Please enter a valid start and end time',
+                    duration: 1500,
+                  });
+                  return;
+                }
+
+                browser.storage.sync.set({ startTime: startTime });
+                browser.storage.sync.set({ endTime: endTime });
+              }
+
               toast({
                 title: 'Settings saved!',
                 duration: 1500,

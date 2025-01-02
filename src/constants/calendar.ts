@@ -88,6 +88,15 @@ export const TIME_OPTIONS: string[] = [
   '23:30',
 ];
 
+export function isValidTime(startTime: string, endTime: string): boolean {
+  // For simplicity's sake, assume that startTime and endTime are elements in TIME_OPTIONS
+  if (!TIME_OPTIONS.includes(startTime) || !TIME_OPTIONS.includes(endTime)) {
+    return false;
+  }
+
+  return TIME_OPTIONS.indexOf(startTime) < TIME_OPTIONS.indexOf(endTime);
+}
+
 export const DAY_OPTIONS: string[] = [
   'Monday',
   'Tuesday',
