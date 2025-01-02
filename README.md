@@ -14,4 +14,9 @@ This Chrome extension automatically schedules meetings on google calendar based 
 ## Notes
 
 1. Everytime I unpack an extension locally to test, I need to update the redirect uri in google cloud console
-2. `pnpm publish` to publish the built `dist` folder to npm registry
+2. To release the distribution file, run the following commands
+
+```bash
+git tag vA.B.C
+git push origin vA.B.C
+```
