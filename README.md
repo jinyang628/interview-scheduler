@@ -9,14 +9,14 @@ This Chrome extension automatically schedules meetings on google calendar based 
 ## Setup
 
 1. Install the extension
-    a) Install directly from the Chrome Web Store (PENDING APPROVAL)
-    b) Download and load the unpacked built extension into Chrome directly
-        - Download `interview-scheduler-vA.B.C.zip` from the [latest release](https://github.com/jinyang628/interview-scheduler/releases)
-        - Unzip the folder
-        - Navigate to `chrome://extensions/` in Chrome
-        - Toggle on `Developer mode` (Top right hand corner)
-        - Click on `Load unpacked` (Top left hand corner)
-        - Select the `dist/chrome-mv3` subfolder within the unzipped folder
+   1. Install directly from the Chrome Web Store (PENDING APPROVAL)
+   2. Download and load the unpacked built extension into Chrome directly
+      1. Download `interview-scheduler-vA.B.C.zip` from the [latest release](https://github.com/jinyang628/interview-scheduler/releases)
+      2. Unzip the folder
+      3. Navigate to `chrome://extensions/` in Chrome
+      4. Toggle on `Developer mode` (Top right hand corner)
+      5. Click on `Load unpacked` (Top left hand corner)
+      6. Select the `dist/chrome-mv3` subfolder within the unzipped folder
   
 2. Fill in all the required information in the options page
 
