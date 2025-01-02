@@ -32,14 +32,14 @@ jobs:
       - name: Run build
         run: pnpm build
 
-      - name: Check dist folder
-        run: ls -la dist
-
       - name: Create Chrome Extension Package
-        run: |
-          zip -r interview-scheduler-${GITHUB_REF#refs/tags/}.zip dist
+        run: zip -r chrome-extension-package-v${{ github.ref_name }}.zip dist
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: interview-scheduler-${GITHUB_REF#refs/tags/}.zip
+      - name: Install GitHub CLI
+        run: sudo apt-get install -y gh
+
+      # Create a release using GitHub CLI
+      - name: Create GitHub Release
+        run: gh release create "${{ github.ref_name }}" chrome-extension-package-v${{ github.ref_name }}.zip --title "${{ github.ref_name }}" --notes "Release for version ${{ github.ref_name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
