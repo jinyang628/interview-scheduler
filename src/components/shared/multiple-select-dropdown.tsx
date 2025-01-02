@@ -35,7 +35,7 @@ export default function MutlipleSelectDropdown({
       <DropdownMenuTrigger className="text-base">
         {selectedItems.map((item) => item[0]).join(' ') || name}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[200px]">
+      <DropdownMenuContent className="w-[200px]" side="bottom" align="center">
         <DropdownMenuSeparator />
         {items.map((item) => (
           <DropdownMenuCheckboxItem

@@ -21,7 +21,7 @@ export default function IndividualSelectDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="text-base">{selectedItem || name}</DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent side="bottom" align="center">
         {items.map((item, index) => (
           <DropdownMenuItem key={index} onClick={() => onSelectItem(item)}>
             {item}
