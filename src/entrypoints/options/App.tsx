@@ -103,7 +103,7 @@ export default function App() {
   return (
     <div className="flex h-screen w-full justify-center p-8">
       <Toaster />
-      <div className="mx-auto flex max-h-[600px] w-full max-w-[600px] flex-col justify-center space-y-4 p-4">
+      <div className="mx-auto flex max-h-[600px] w-full max-w-[750px] flex-col justify-center space-y-4 p-4">
         <Card className="mx-auto flex w-full max-w-[auto] flex-col justify-center space-y-4 p-4 align-middle">
           <p className="text-base font-semibold">OpenAI API Key:</p>
           <Input
@@ -135,24 +135,20 @@ export default function App() {
           />
           <p className="text-base font-semibold">Preferred Interview Timings:</p>
           <div className="flex justify-around">
-            <div className="flex w-[40%] space-x-4">
-              <div className="flex w-[40%] justify-center">
-                <IndividualSelectDropdown
-                  name="Earliest Start Time"
-                  items={TIME_OPTIONS}
-                  selectedItem={startTime}
-                  onSelectItem={(item) => setStartTime(item)}
-                />
-              </div>
-              <p className="flex justify-center">-</p>
-              <div className="flex w-[40%] justify-center">
-                <IndividualSelectDropdown
-                  name="Latest End Time"
-                  items={TIME_OPTIONS}
-                  selectedItem={endTime}
-                  onSelectItem={(item) => setEndTime(item)}
-                />
-              </div>
+            <div className="flex w-[40%] justify-center space-x-4">
+              <IndividualSelectDropdown
+                name="Earliest Start Time"
+                items={TIME_OPTIONS}
+                selectedItem={startTime}
+                onSelectItem={(item) => setStartTime(item)}
+              />
+              <p>-</p>
+              <IndividualSelectDropdown
+                name="Latest End Time"
+                items={TIME_OPTIONS}
+                selectedItem={endTime}
+                onSelectItem={(item) => setEndTime(item)}
+              />
             </div>
             <MultipleSelectDropdown
               name="Preferred Days"
