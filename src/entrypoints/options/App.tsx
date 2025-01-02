@@ -136,7 +136,7 @@ export default function App() {
           <p className="text-base font-semibold">Preferred Interview Timings:</p>
           <div className="flex justify-around">
             <div className="flex w-[40%] space-x-4">
-              <div className="w-[40%]">
+              <div className="flex w-[40%] justify-center">
                 <IndividualSelectDropdown
                   name="Earliest Start Time"
                   items={TIME_OPTIONS}
@@ -144,8 +144,8 @@ export default function App() {
                   onSelectItem={(item) => setStartTime(item)}
                 />
               </div>
-              <p>-</p>
-              <div className="w-[40%]">
+              <p className="flex justify-center">-</p>
+              <div className="flex w-[40%] justify-center">
                 <IndividualSelectDropdown
                   name="Latest End Time"
                   items={TIME_OPTIONS}

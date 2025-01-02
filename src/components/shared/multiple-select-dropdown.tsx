@@ -1,15 +1,7 @@
-'use client';
-
-import * as React from 'react';
-
-import { Check, ChevronsUpDown } from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -40,7 +32,9 @@ export default function MutlipleSelectDropdown({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>{name || selectedItems.join(' ')[0]}</DropdownMenuTrigger>
+      <DropdownMenuTrigger>
+        {name || selectedItems.map((item) => item[0]).join(' ')}
+      </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[200px]">
         <DropdownMenuSeparator />
         {items.map((item) => (
