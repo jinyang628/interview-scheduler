@@ -25,7 +25,6 @@ export default function App() {
   const [endTime, setEndTime] = useState<string>('');
   const [preferredDays, setPreferredDays] = useState<string[]>([]);
   const [timezone, setTimezone] = useState<string>('');
-
   const [authenticationStatus, setAuthenticationStatus] = useState<AuthenticationStatus>('loading');
 
   useEffect(() => {
@@ -100,6 +99,59 @@ export default function App() {
     }
   };
 
+  const authenticateSection = (
+    <div className="flex items-center justify-center space-x-2">
+      <Button className="gap-2" disabled={!clientId} onClick={handleAuthentication}>
+        <FaGoogle className="size-5" />
+        Authenticate with Google
+      </Button>
+      {authenticationStatus === 'yes' ? (
+        <CheckCircle className="size-8 text-green-500" />
+      ) : authenticationStatus === 'no' || authenticationStatus === 'error' ? (
+        <XCircle className="size-8 text-red-500" />
+      ) : authenticationStatus === 'loading' ? (
+        <Loader isLoading={true} />
+      ) : null}
+    </div>
+  );
+
+  const saveButton = (
+    <Button
+      onClick={() => {
+        browser.storage.sync.set({ openAiKey: openAiKey });
+        browser.storage.sync.set({
+          clientId: clientId,
+        });
+        browser.storage.sync.set({
+          clientSecret: clientSecret,
+        });
+        browser.storage.sync.set({ name: name });
+        browser.storage.sync.set({ preferredDays: preferredDays });
+        browser.storage.sync.set({ timezone: timezone });
+        if (startTime && endTime) {
+          if (!isValidTime(startTime, endTime)) {
+            toast({
+              title: 'Invalid timings',
+              description: 'Please enter a valid start and end time',
+              duration: 1500,
+            });
+            return;
+          }
+
+          browser.storage.sync.set({ startTime: startTime });
+          browser.storage.sync.set({ endTime: endTime });
+        }
+
+        toast({
+          title: 'Settings saved!',
+          duration: 1500,
+        });
+      }}
+    >
+      Save
+    </Button>
+  );
+
   return (
     <div className="flex h-screen w-full justify-center p-8">
       <Toaster />
@@ -164,55 +216,8 @@ export default function App() {
               onSelectItem={(item) => setTimezone(item)}
             />
           </div>
-
-          <div className="flex items-center justify-center space-x-2">
-            <Button className="gap-2" disabled={!clientId} onClick={handleAuthentication}>
-              <FaGoogle className="size-5" />
-              Authenticate with Google
-            </Button>
-            {authenticationStatus === 'yes' ? (
-              <CheckCircle className="size-8 text-green-500" />
-            ) : authenticationStatus === 'no' || authenticationStatus === 'error' ? (
-              <XCircle className="size-8 text-red-500" />
-            ) : authenticationStatus === 'loading' ? (
-              <Loader isLoading={true} />
-            ) : null}
-          </div>
-
-          <Button
-            onClick={() => {
-              browser.storage.sync.set({ openAiKey: openAiKey });
-              browser.storage.sync.set({
-                clientId: clientId,
-              });
-              browser.storage.sync.set({
-                clientSecret: clientSecret,
-              });
-              browser.storage.sync.set({ name: name });
-              browser.storage.sync.set({ preferredDays: preferredDays });
-              browser.storage.sync.set({ timezone: timezone });
-              if (startTime && endTime) {
-                if (!isValidTime(startTime, endTime)) {
-                  toast({
-                    title: 'Invalid timings',
-                    description: 'Please enter a valid start and end time',
-                    duration: 1500,
-                  });
-                  return;
-                }
-
-                browser.storage.sync.set({ startTime: startTime });
-                browser.storage.sync.set({ endTime: endTime });
-              }
-
-              toast({
-                title: 'Settings saved!',
-                duration: 1500,
-              });
-            }}
-          >
-            Save
-          </Button>
+          {authenticateSection}
+          {saveButton}
         </Card>
       </div>
     </div>
