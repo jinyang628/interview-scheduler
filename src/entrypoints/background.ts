@@ -30,6 +30,7 @@ export default defineBackground(() => {
             const input = scheduleCalendarEventRequestSchema.parse(message.input);
             let timeslotValidity: TimeslotValidity;
             let extractTimeslotResponse: ExtractTimeslotResponse;
+            let preferredTimeslots: PreferredTimeslots;
             while (true) {
               logger.info('~Extracting Timeslot~');
               extractTimeslotResponse = await extractTimeslot({
@@ -37,7 +38,7 @@ export default defineBackground(() => {
                 inferenceConfig: INFERENCE_CONFIG,
               });
               logger.info('~Validating Timeslot~');
-              const preferredTimeslots: PreferredTimeslots = preferredTimeslotsSchema.parse({
+              preferredTimeslots = preferredTimeslotsSchema.parse({
                 earliestStartTime: await browser.storage.sync
                   .get('startTime')
                   .then((result) => result.startTime)
