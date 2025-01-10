@@ -1,10 +1,20 @@
+import { Timeslot } from '@/types/calendar/base';
+import { PreferredTimeslots } from '@/types/calendar/preference';
+
 export const VALID_TIME_SLOT_SYSTEM_PROMPT = `You have 2 tasks.
 
 1. Extract the calendar event information given the context of the email content. If a zoom/microsoft/google meeting link or hackkerank/codepair link is specified in the email, you must include it clearly in the description of your response.
 
 2. Provide a short, polite email reply to the sender acknowledging the date and time of the meeting. You should INCLUDE the "Dear [SENDER NAME],\n" prefix but OMIT the "Best regards..." suffix in your reply.`;
 
-export const RESCHEDULE_TIME_SLOT_SYSTEM_PROMPT = (busyPeriods: string) => `You have 2 tasks.
+export type RescheduleTimeSlotSystemPromptArgs = {
+  busyTimeslots: Timeslot[];
+  preferredTimeslots: PreferredTimeslots;
+};
+export const RESCHEDULE_TIME_SLOT_SYSTEM_PROMPT = ({
+  busyTimeslots,
+  preferredTimeslots,
+}: RescheduleTimeSlotSystemPromptArgs) => `You have 2 tasks.
 
 1. Extract the calendar event information given the context of the email content. Do NOT include the start date and end date of the meeting as part of the description (because we are rescheduling the meeting).
 
@@ -18,5 +28,11 @@ Your newly proposed date and time should abide by the following rules:
 5. You should state your proposed date and time in the timezone of the sender and state that timezone explicitly in your reply.
 
 My busy periods:
-${busyPeriods}
+${busyTimeslots.join('\n')}
+
+My preferred days:
+${preferredTimeslots.preferredDays.join(', ')}
+
+My preferred timeslots:
+${preferredTimeslots.earliestStartTime}-${preferredTimeslots.latestEndTime}
 `;

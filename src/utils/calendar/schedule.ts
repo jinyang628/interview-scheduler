@@ -12,6 +12,7 @@ import {
   calendarEventSchema,
   timeslotSchema,
 } from '@/types/calendar/base';
+import { PreferredTimeslots } from '@/types/calendar/preference';
 import {
   EMAIL_REPLY_TEMPLATE,
   ScheduleEventResponse,
@@ -29,14 +30,16 @@ import { logger } from '@/lib/logger';
 type ScheduleCalendarEventProps = {
   messages: EmailMessage[];
   timeslotValidity: TimeslotValidity;
-  initialTimeslot: Timeslot;
+  proposedTimeslot: Timeslot;
+  preferredTimeslots: PreferredTimeslots;
   inferenceConfig: InferenceConfig;
 };
 
 export default async function scheduleCalendarEvent({
   messages,
   timeslotValidity,
-  initialTimeslot,
+  proposedTimeslot,
+  preferredTimeslots,
   inferenceConfig,
 }: ScheduleCalendarEventProps): Promise<ScheduleEventResponse> {
   const client = await getInferenceClient(inferenceConfig);
@@ -65,23 +68,28 @@ export default async function scheduleCalendarEvent({
       createCalendarEventRequest = calendarEventSchema.parse({
         summary: validTimeslotResponse.summary,
         description: validTimeslotResponse.description,
-        timeslot: initialTimeslot,
+        timeslot: proposedTimeslot,
       });
       emailReply = validTimeslotResponse.reply;
       break;
     case timeslotValiditySchema.Values.endDateBeforeStartDate:
+      // This error should have been caught beforehand and not reached here
       throw new Error('End date cannot be before start date');
     case timeslotValiditySchema.Values.currentDatePastStartDate ||
-      timeslotValiditySchema.Values.booked:
+      timeslotValiditySchema.Values.booked ||
+      timeslotValiditySchema.Values.outsidePreferredTimeslots:
       busyTimeslots = await getAdjacentBusyTimeslots({
-        initialTimeslot: initialTimeslot,
+        initialTimeslot: proposedTimeslot,
       });
       logger.info('~Inferring timeslots to reschedule to~');
       const rescheduleTimeslotResponse = await client.infer({
         messages: [
           {
             role: role.Values.system,
-            content: RESCHEDULE_TIME_SLOT_SYSTEM_PROMPT(busyTimeslots.join('\n')),
+            content: RESCHEDULE_TIME_SLOT_SYSTEM_PROMPT({
+              busyTimeslots: busyTimeslots,
+              preferredTimeslots: preferredTimeslots,
+            }),
           },
           {
             role: role.Values.user,
@@ -122,10 +130,10 @@ async function getAdjacentBusyTimeslots({
   initialTimeslot,
 }: ProposeAlternativeTimeslotProps): Promise<Timeslot[]> {
   const startDateBoundary = new Date(
-    new Date(initialTimeslot.start.dateTime).getTime() - 12 * 60 * 60 * 1000,
+    new Date(initialTimeslot.start.dateTime).getTime() - 36 * 60 * 60 * 1000,
   );
   const endDateBoundary = new Date(
-    new Date(initialTimeslot.end.dateTime).getTime() + 12 * 60 * 60 * 1000,
+    new Date(initialTimeslot.end.dateTime).getTime() + 36 * 60 * 60 * 1000,
   );
   const events: CalendarEvent[] = await getCalendarEvents({ startDateBoundary, endDateBoundary });
   const busyTimeslots: Timeslot[] = events.map((event) =>

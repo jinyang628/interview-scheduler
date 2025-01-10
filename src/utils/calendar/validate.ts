@@ -4,17 +4,23 @@ import { CalendarEvent, Timeslot } from '@/types/calendar/base';
 import { PreferredTimeslots } from '@/types/calendar/preference';
 import { TimeslotValidity, timeslotValiditySchema } from '@/types/calendar/validate';
 
-type ValidateTimeslotProps = {
+type IsProposedTimeslotPreferredProps = {
   proposedTimeslot: Timeslot;
   preferredTimeslots: PreferredTimeslots;
 };
 
-// function proposedTimeslotIsWithinPreferredTimeslots({
-//   proposedTimeslot,
-//   preferredTimeslots,
-// }): boolean {
+function isProposedTimeslotPreferred({
+  proposedTimeslot,
+  preferredTimeslots,
+}: IsProposedTimeslotPreferredProps): boolean {
+  // TODO: Implement this function
+  return true;
+}
 
-// }
+type ValidateTimeslotProps = {
+  proposedTimeslot: Timeslot;
+  preferredTimeslots: PreferredTimeslots;
+};
 
 export default async function validateTimeslot({
   proposedTimeslot,
@@ -51,6 +57,14 @@ export default async function validateTimeslot({
     return timeslotValiditySchema.Values.valid;
   }
 
-  // return;
+  if (
+    !isProposedTimeslotPreferred({
+      proposedTimeslot: proposedTimeslot,
+      preferredTimeslots: preferredTimeslots,
+    })
+  ) {
+    return timeslotValiditySchema.Values.outsidePreferredTimeslots;
+  }
+
   return timeslotValiditySchema.Values.valid;
 }

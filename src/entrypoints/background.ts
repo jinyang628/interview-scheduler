@@ -78,7 +78,8 @@ export default defineBackground(() => {
             const scheduleEventResponse: ScheduleEventResponse = await scheduleCalendarEvent({
               messages: input.messages,
               timeslotValidity: timeslotValidity,
-              initialTimeslot: extractTimeslotResponse.timeslot,
+              proposedTimeslot: extractTimeslotResponse.timeslot,
+              preferredTimeslots: preferredTimeslots,
               inferenceConfig: INFERENCE_CONFIG,
             });
             logger.info('Schedule Calendar Event response:', scheduleEventResponse);
