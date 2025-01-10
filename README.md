@@ -30,7 +30,8 @@ This Chrome extension automatically schedules meetings on google calendar based 
 ## Future feature extensions
 
 1. Only schedule meetings for the opened conversation
-2. Fix corrupted CSS from script injection
+2. Refresh button to avoid the need to refresh the popup
+3. Fix corrupted CSS from script injection
 
 ## Notes for self
 

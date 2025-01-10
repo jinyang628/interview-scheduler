@@ -121,7 +121,7 @@ export default function App() {
       ) : (
         <>
           {/* TODO: Add refresh functionality (might need to rework the expected UI of diff schedulingStatus) */}
-          <IoReload />
+          {/* <IoReload /> */}
           <ScrollArea className="h-[80%] w-[80%]">
             <CopyableText text={scheduleCalendarEventResponse?.response!.reply || ''} />
           </ScrollArea>
