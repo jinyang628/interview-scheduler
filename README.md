@@ -4,7 +4,7 @@ This Chrome extension automatically schedules meetings on google calendar based 
 
 ## Demo Video
 
-~PLACEHOLDER~
+[Demo](https://user-images.githubusercontent.com/jinyang628/interview-scheduler/assets/media/demo.mp4)
 
 ## Setup
 

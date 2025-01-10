@@ -68,16 +68,17 @@ export default async function scheduleCalendarEvent({
       createCalendarEventRequest = calendarEventSchema.parse({
         summary: validTimeslotResponse.summary,
         description: validTimeslotResponse.description,
-        timeslot: proposedTimeslot,
+        start: proposedTimeslot.start,
+        end: proposedTimeslot.end,
       });
       emailReply = validTimeslotResponse.reply;
       break;
     case timeslotValiditySchema.Values.endDateBeforeStartDate:
       // This error should have been caught beforehand and not reached here
       throw new Error('End date cannot be before start date');
-    case timeslotValiditySchema.Values.currentDatePastStartDate ||
-      timeslotValiditySchema.Values.booked ||
-      timeslotValiditySchema.Values.outsidePreferredTimeslots:
+    case timeslotValiditySchema.Values.currentDatePastStartDate:
+    case timeslotValiditySchema.Values.booked:
+    case timeslotValiditySchema.Values.outsidePreferredTimeslots:
       busyTimeslots = await getAdjacentBusyTimeslots({
         initialTimeslot: proposedTimeslot,
       });
@@ -111,7 +112,7 @@ export default async function scheduleCalendarEvent({
     default:
       throw new Error('Invalid calendar event validity');
   }
-
+  console.log('Create Calendar Event Request', createCalendarEventRequest);
   const eventUrl: string = await createCalendarEvent(createCalendarEventRequest);
   return scheduleEventResponseSchema.parse({
     eventUrl: eventUrl,

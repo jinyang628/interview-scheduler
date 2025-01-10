@@ -26,6 +26,7 @@ Your newly proposed date and time should abide by the following rules:
 3. You are given some timeslots when I am busy below, and you should schedule the meeting at a time that is at least 30 minutes away from the busy periods.
 4. The sender might list a couple of timeslots in the email content or suggest some dates/times to choose from. Prioritise those timeslots as much as possible.  
 5. You should state your proposed date and time in the timezone of the sender and state that timezone explicitly in your reply.
+6. Double check that your proposed date and day is correct!
 
 My busy periods:
 ${busyTimeslots.join('\n')}

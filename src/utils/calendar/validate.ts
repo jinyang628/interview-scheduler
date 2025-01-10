@@ -4,6 +4,8 @@ import { CalendarEvent, Timeslot } from '@/types/calendar/base';
 import { PreferredTimeslots } from '@/types/calendar/preference';
 import { TimeslotValidity, timeslotValiditySchema } from '@/types/calendar/validate';
 
+import { logger } from '@/lib/logger';
+
 type IsProposedTimeslotPreferredProps = {
   proposedTimeslot: Timeslot;
   preferredTimeslots: PreferredTimeslots;
@@ -53,7 +55,7 @@ export default async function validateTimeslot({
     !preferredTimeslots.timezone ||
     preferredTimeslots.preferredDays.length === 0
   ) {
-    console.log('Preferred timeslots are not set', preferredTimeslots);
+    logger.info('Preferred timeslots are not set', preferredTimeslots);
     return timeslotValiditySchema.Values.valid;
   }
 
@@ -63,6 +65,7 @@ export default async function validateTimeslot({
       preferredTimeslots: preferredTimeslots,
     })
   ) {
+    logger.info('Proposed timeslot is not within preferred timeslots');
     return timeslotValiditySchema.Values.outsidePreferredTimeslots;
   }
 

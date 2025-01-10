@@ -15,7 +15,7 @@ export type Timeslot = z.infer<typeof timeslotSchema>;
 
 export const calendarEventSchema = timeslotSchema.extend({
   summary: z.string(),
-  description: z.string(),
+  description: z.string().default(''),
 });
 
 export type CalendarEvent = z.infer<typeof calendarEventSchema>;
