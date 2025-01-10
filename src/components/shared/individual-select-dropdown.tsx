@@ -24,8 +24,12 @@ export default function IndividualSelectDropdown({
       <DropdownMenuTrigger className="rounded-md bg-primary px-2 py-1 text-primary-foreground">
         {selectedItem || name}
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="center">
-        <ScrollArea className="h-[250px] pr-4">
+      <DropdownMenuContent
+        className="h-[250px]"
+        side="bottom"
+        align="center"
+      >
+        <ScrollArea className="h-full pr-4">
           <div className="space-y-1">
             {items.map((item, index) => (
               <DropdownMenuItem key={index} onClick={() => onSelectItem(item)}>
