@@ -4,7 +4,7 @@ This Chrome extension automatically schedules meetings on google calendar based 
 
 ## Demo Video
 
-[Demo](https://youtu.be/WUCRwpaiq48)
+https://github.com/user-attachments/assets/e2167784-9594-4358-ad29-5bbae12e9112
 
 ## Setup
 
