@@ -4,6 +4,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type DropdownWithItemsProps = {
   name: string;
@@ -20,13 +21,19 @@ export default function IndividualSelectDropdown({
 }: DropdownWithItemsProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="text-base">{selectedItem || name}</DropdownMenuTrigger>
+      <DropdownMenuTrigger className="rounded-md bg-primary px-2 py-1 text-primary-foreground">
+        {selectedItem || name}
+      </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="center">
-        {items.map((item, index) => (
-          <DropdownMenuItem key={index} onClick={() => onSelectItem(item)}>
-            {item}
-          </DropdownMenuItem>
-        ))}
+        <ScrollArea className="h-[250px] pr-4">
+          <div className="space-y-1">
+            {items.map((item, index) => (
+              <DropdownMenuItem key={index} onClick={() => onSelectItem(item)}>
+                {item}
+              </DropdownMenuItem>
+            ))}
+          </div>
+        </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
   );

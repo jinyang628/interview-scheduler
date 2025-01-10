@@ -5,6 +5,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type MutlipleSelectDropdownProps = {
   name: string;
@@ -32,20 +33,23 @@ export default function MutlipleSelectDropdown({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="text-base">
+      <DropdownMenuTrigger className="rounded-md bg-primary px-2 py-1 text-primary-foreground">
         {selectedItems.map((item) => item[0]).join(' ') || name}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[200px]" side="bottom" align="center">
-        <DropdownMenuSeparator />
-        {items.map((item) => (
-          <DropdownMenuCheckboxItem
-            key={item}
-            checked={selectedItems.includes(item)}
-            onCheckedChange={() => handleToggle(item)}
-          >
-            {item}
-          </DropdownMenuCheckboxItem>
-        ))}
+      <DropdownMenuContent side="bottom" align="center">
+        <ScrollArea className="h-[250px] pr-4">
+          <div className="space-y-1">
+            {items.map((item) => (
+              <DropdownMenuCheckboxItem
+                key={item}
+                checked={selectedItems.includes(item)}
+                onCheckedChange={() => handleToggle(item)}
+              >
+                {item}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </div>
+        </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
   );
