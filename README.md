@@ -32,6 +32,7 @@ https://github.com/user-attachments/assets/e2167784-9594-4358-ad29-5bbae12e9112
 1. Only schedule meetings for the opened conversation
 2. Refresh button to avoid the need to refresh the popup
 3. Fix corrupted CSS from script injection
+4. Get AMD privacy policy out and publish the extension (host the google cloud project)
 
 ## Notes for self
 
