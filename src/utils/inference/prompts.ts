@@ -38,4 +38,6 @@ ${preferredTimeslots.preferredDays.join(', ')}
 
 My preferred timeslots:
 ${preferredTimeslots.earliestStartTime}-${preferredTimeslots.latestEndTime}
+
+Today's date is ${new Date().toLocaleDateString()}.
 `;
